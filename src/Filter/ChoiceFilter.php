@@ -35,6 +35,7 @@ class ChoiceFilter extends AbstractFilter
                 'template_html' => '@DataTables/Filter/select.html.twig',
                 'template_js' => '@DataTables/Filter/select.js.twig',
                 'placeholder' => null,
+                'operator' => '=',
                 'choices' => [],
             ])
             ->setAllowedTypes('placeholder', ['null', 'string'])

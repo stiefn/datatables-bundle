@@ -25,6 +25,14 @@ abstract class AbstractFilter
     /** @var string */
     protected $operator;
 
+    public function __construct(?array $options = null) {
+        if(!is_null($options)) {
+            $this->set($options);
+        } else {
+            $this->set([]);
+        }
+    }
+
     /**
      * @param array $options
      */

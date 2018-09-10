@@ -27,6 +27,7 @@ class TextFilter extends AbstractFilter
             ->setDefaults([
                 'template_html' => '@DataTables/Filter/text.html.twig',
                 'template_js' => '@DataTables/Filter/text.js.twig',
+                'operator' => 'LIKE',
                 'placeholder' => null,
             ])
             ->setAllowedTypes('placeholder', ['null', 'string']);

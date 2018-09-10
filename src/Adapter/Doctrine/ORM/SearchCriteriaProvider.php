@@ -45,8 +45,12 @@ class SearchCriteriaProvider implements QueryBuilderProcessorInterface
             $column = $searchInfo['column'];
             $search = $searchInfo['search'];
 
-            if (!empty($search) && null !== ($filter = $column->getFilter())) {
-                $queryBuilder->andWhere(new Comparison($column->getField(), $filter->getOperator(), $search));
+            if (strlen($search) > 0 && null !== ($filter = $column->getFilter())) {
+                if($filter->getOperator() == 'LIKE') {
+                    $queryBuilder->andWhere($queryBuilder->expr()->like($column->getField(), $queryBuilder->expr()->literal('%' . $search . '%')));
+                } else {
+                    $queryBuilder->andWhere(new Comparison($column->getField(), $filter->getOperator(), $queryBuilder->expr()->literal($search)));
+                }
             }
         }
     }
@@ -61,9 +65,8 @@ class SearchCriteriaProvider implements QueryBuilderProcessorInterface
             $expr = $queryBuilder->expr();
             $comparisons = $expr->orX();
             foreach ($state->getDataTable()->getColumns() as $column) {
-                if ($column->isGlobalSearchable() && !empty($column->getField()) && $column->isValidForSearch($globalSearch)) {
-                    $comparisons->add(new Comparison($column->getLeftExpr(), $column->getOperator(),
-                        $expr->literal($column->getRightExpr($globalSearch))));
+                if ($column->isGlobalSearchable() && !empty($field = $column->getField())) {
+                    $comparisons->add($expr->like($field, $expr->literal("%{$globalSearch}%")));
                 }
             }
             $queryBuilder->andWhere($comparisons);
