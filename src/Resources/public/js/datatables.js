@@ -54,8 +54,8 @@
                             data.draw = request.draw;
                             drawCallback(data);
                             data = null;
-                            if (Object.keys(state).length) {
-                                var merged = $.extend(true, {}, dt.state(), state);
+							var merged = $.extend(true, {}, dt.state(), state);
+                            if (Object.keys(merged).length) {
                                 dt
                                     .order(merged.order)
                                     .search(merged.search.search)
