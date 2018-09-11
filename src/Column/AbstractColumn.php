@@ -86,12 +86,6 @@ abstract class AbstractColumn
      */
     protected function render($value, $context)
     {
-        if (is_string($render = $this->options['render'])) {
-            return sprintf($render, $value);
-        } elseif (is_callable($render)) {
-            return call_user_func($render, $value, $context);
-        }
-
         return $value;
     }
 
@@ -141,7 +135,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('globalSearchable',  ['null', 'boolean'])
             ->setAllowedTypes('filter', ['null', AbstractFilter::class])
             ->setAllowedTypes('className', ['null', 'string'])
-            ->setAllowedTypes('render', ['null', 'string', 'callable'])
+            ->setAllowedTypes('render', ['null', 'array'])
             ->setAllowedTypes('operator', ['string'])
             ->setAllowedTypes('leftExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
@@ -333,6 +327,14 @@ abstract class AbstractColumn
     public function isFileMany(): bool
     {
         return $this->options['fileMany'];
+    }
+
+    public function getMapping(): array {
+        return [];
+    }
+
+    public function getRender() {
+        return $this->options['render'];
     }
 
 }

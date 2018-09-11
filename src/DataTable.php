@@ -335,6 +335,7 @@ class DataTable
                         'searchable' => $column->isSearchable(),
                         'visible' => $column->isVisible(),
                         'className' => $column->getClassName(),
+                        'render' => $column->getRender()
                     ];
                 }, $this->getColumns()
             ),
@@ -356,6 +357,17 @@ class DataTable
                 }
                 if($column->isFileMany()) {
                     $map[$i]['type'] = 'uploadMany';
+                }
+                if(!empty($column->getMapping())) {
+                    $map[$i]['type'] = 'select';
+                    $mapping = [];
+                    foreach($column->getMapping() as $key => $value) {
+                        $mapping[] = [
+                            'label' => $value,
+                            'value' => $key
+                        ];
+                    }
+                    $map[$i]['options'] = $mapping;
                 }
                 ++$i;
             }

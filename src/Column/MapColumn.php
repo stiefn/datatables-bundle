@@ -21,12 +21,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MapColumn extends TextColumn
 {
+
+    public function initialize(string $name, int $index, array $options = [], DataTable $dataTable)
+    {
+        parent::initialize($name, $index, $options, $dataTable);
+
+        if(!isset($options['render'])) {
+            $this->options['render'] = $this->getMapping();
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     public function normalize($value): string
     {
-        return parent::normalize($this->options['map'][$value] ?? $this->options['default'] ?? $value);
+        return $value;
     }
 
     /**
@@ -47,5 +57,9 @@ class MapColumn extends TextColumn
         ;
 
         return $this;
+    }
+
+    public function getMapping() {
+        return $this->options['map'];
     }
 }

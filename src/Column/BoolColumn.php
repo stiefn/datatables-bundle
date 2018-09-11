@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Omines\DataTablesBundle\Column;
 
+use Omines\DataTablesBundle\DataTable;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -21,16 +22,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BoolColumn extends AbstractColumn
 {
+
+    public function initialize(string $name, int $index, array $options = [], DataTable $dataTable)
+    {
+        parent::initialize($name, $index, $options, $dataTable);
+
+        if(!isset($options['render'])) {
+            $this->options['render'] = $this->getMapping();
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function normalize($value): string
+    public function normalize($value)
     {
-        if (null === $value) {
-            return $this->getNullValue();
-        }
-
-        return ((bool) $value) ? $this->getTrueValue() : $this->getFalseValue();
+        return $value ? 1 : 0;
     }
 
     /**
@@ -92,5 +99,12 @@ class BoolColumn extends AbstractColumn
     {
         $value = trim(strtolower($value));
         return ($value == $this->getTrueValue()) || ($value == $this->getFalseValue());
+    }
+
+    public function getMapping(): array {
+        return [
+            0 => $this->options['falseValue'],
+            1 => $this->options['trueValue']
+        ];
     }
 }
