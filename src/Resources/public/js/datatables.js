@@ -46,6 +46,22 @@
             }).done(function(data) {
                 var baseState;
 
+                console.log(data.options.columns.length);
+                function createRenderFunction(map) {
+                    return function ( value, type, row, meta ) {
+                        if(map[value]) {
+                            return map[value];
+                        }
+                        return '';
+                    }
+                }
+                for(var i = 0; i < data.options.columns.length; ++i) {
+                    if(data.options.columns[i].render) {
+                        var map = data.options.columns[i].render;
+                        data.options.columns[i].render = createRenderFunction(map);
+                    }
+                }
+                console.log(data.options.columns);
                 // Merge all options from different sources together and add the Ajax loader
                 var dtOpts = $.extend({}, data.options, config.options, options, persistOptions, {
                     ajax: function (request, drawCallback, settings) {
