@@ -304,6 +304,7 @@ class DataTable
         ];
         if ($this->state->isInitial()) {
             $response['options'] = $this->getInitialResponse();
+            $response['editorOptions'] = $this->getInitialEditorResponse();
             $response['template'] = $this->renderer->renderDataTable($this, $this->template, $this->templateParams);
         }
 
@@ -325,6 +326,23 @@ class DataTable
                 }, $this->getColumns()
             ),
         ]);
+    }
+
+    protected function getInitialEditorResponse(): array
+    {
+        $map = [];
+        foreach($this->getColumns() as $column) {
+            if($column->isEditable()) {
+                $map[] = [
+                    'label' => $column->getLabel(),
+                    'name' => $column->getName(),
+                    'file' => $column->isFile()
+                ];
+            }
+        }
+        return [
+            'fields' => $map
+        ];
     }
 
     /**

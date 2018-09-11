@@ -126,6 +126,8 @@ abstract class AbstractColumn
                 'leftExpr' => null,
                 'operator' => '=',
                 'rightExpr' => null,
+                'editable' => true,
+                'file' => false
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -142,6 +144,8 @@ abstract class AbstractColumn
             ->setAllowedTypes('operator', ['string'])
             ->setAllowedTypes('leftExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
+            ->setAllowedTypes('editable', ['null', 'boolean'])
+            ->setAllowedTypes('file', ['null', 'boolean'])
         ;
 
         return $this;
@@ -312,6 +316,16 @@ abstract class AbstractColumn
     public function isValidForSearch($value)
     {
         return true;
+    }
+
+    public function isEditable(): bool
+    {
+        return $this->options['editable'];
+    }
+
+    public function isFile(): bool
+    {
+        return $this->options['file'];
     }
 
 }
