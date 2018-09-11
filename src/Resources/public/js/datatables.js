@@ -12,11 +12,10 @@
     /**
      * Initializes the datatable dynamically.
      */
-    $.fn.initDataTables = function(config, options) {
+    $.fn.initDataTables = function(config, options, editorOptions) {
         var root = this,
-            config = $.extend({}, $.fn.initDataTables.defaults, config),
-            state = ''
-        ;
+            state = '';
+        config = $.extend({}, $.fn.initDataTables.defaults, config);
 
         // Load page state if needed
         switch (config.state) {
@@ -54,7 +53,7 @@
                             data.draw = request.draw;
                             drawCallback(data);
                             data = null;
-							var merged = $.extend(true, {}, dt.state(), state);
+                            var merged = $.extend(true, {}, dt.state(), state);
                             if (Object.keys(merged).length) {
                                 dt
                                     .order(merged.order)
@@ -76,7 +75,15 @@
                 });
 
                 root.html(data.template);
-                dt = $('table', root).DataTable(dtOpts);
+                var dt = $('table', root).DataTable(dtOpts);
+                var editor = null;
+                if(data.editorOptions) {
+                    var editorOpts = $.extend({}, data.editorOptions, editorOptions);
+                    editorOpts['table'] = '#' + config.name;
+                    editorOpts['ajax'] = config.url;
+                    console.log(editorOpts);
+                    editor = new $.fn.dataTable.Editor(editorOpts);
+                }
                 if (config.state !== 'none') {
                     dt.on('draw.dt', function(e) {
                         var data = $.param(dt.state()).split('&');
@@ -100,7 +107,15 @@
                     })
                 }
 
-                fulfill(dt);
+                if(data.editorOptions) {
+                    fulfill({
+                        'dt': dt,
+                        'editor': editor
+                    })
+                }
+                fulfill({
+                    'dt': dt
+                });
             }).fail(function(xhr, cause, msg) {
                 console.error('DataTables request failed: ' + msg);
                 reject(cause);
