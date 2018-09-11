@@ -127,7 +127,8 @@ abstract class AbstractColumn
                 'operator' => '=',
                 'rightExpr' => null,
                 'editable' => true,
-                'file' => false
+                'file' => false,
+                'fileMany' => false
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -146,6 +147,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('editable', ['null', 'boolean'])
             ->setAllowedTypes('file', ['null', 'boolean'])
+            ->setAllowedTypes('fileMany', ['null', 'boolean'])
         ;
 
         return $this;
@@ -326,6 +328,11 @@ abstract class AbstractColumn
     public function isFile(): bool
     {
         return $this->options['file'];
+    }
+
+    public function isFileMany(): bool
+    {
+        return $this->options['fileMany'];
     }
 
 }

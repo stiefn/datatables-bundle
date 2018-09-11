@@ -92,6 +92,9 @@ class DataTable
     /** @var string */
     protected $translationDomain = 'messages';
 
+    /** @var bool */
+    protected $useEditor = false;
+
     /** @var DataTableRendererInterface */
     private $renderer;
 
@@ -221,6 +224,14 @@ class DataTable
     }
 
     /**
+     * @return bool
+     */
+    public function getUseEditor(): bool
+    {
+        return $this->useEditor;
+    }
+
+    /**
      * @return string
      */
     public function getName(): string
@@ -304,7 +315,9 @@ class DataTable
         ];
         if ($this->state->isInitial()) {
             $response['options'] = $this->getInitialResponse();
-            $response['editorOptions'] = $this->getInitialEditorResponse();
+            if($this->getUseEditor()) {
+                $response['editorOptions'] = $this->getInitialEditorResponse();
+            }
             $response['template'] = $this->renderer->renderDataTable($this, $this->template, $this->templateParams);
         }
 
@@ -331,15 +344,23 @@ class DataTable
     protected function getInitialEditorResponse(): array
     {
         $map = [];
+        $i = 0;
         foreach($this->getColumns() as $column) {
             if($column->isEditable()) {
-                $map[] = [
+                $map[$i] = [
                     'label' => $column->getLabel(),
-                    'name' => $column->getName(),
-                    'file' => $column->isFile()
+                    'name' => $column->getName()
                 ];
+                if($column->isFile()) {
+                    $map[$i]['type'] = 'upload';
+                }
+                if($column->isFileMany()) {
+                    $map[$i]['type'] = 'uploadMany';
+                }
+                ++$i;
             }
         }
+
         return [
             'fields' => $map
         ];
@@ -415,6 +436,17 @@ class DataTable
     public function setMethod(string $method): self
     {
         $this->method = $method;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $useEditor
+     * @return $this
+     */
+    public function useEditor(bool $useEditor): self
+    {
+        $this->useEditor = $useEditor;
 
         return $this;
     }
