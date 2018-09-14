@@ -305,6 +305,14 @@ abstract class AbstractColumn
         return $this;
     }
 
+    public function getOption(string $name)
+    {
+        if(isset($this->options[$name])) {
+            return $this->options[$name];
+        }
+        return null;
+    }
+
     /**
      * @param string $value
      * @return bool

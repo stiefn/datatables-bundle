@@ -45,11 +45,11 @@ class TextColumn extends AbstractColumn
                 function ($value) {
                     return '%' . $value . '%';
                 }
-        );
-
-        $resolver
+            )
             ->setDefault('raw', false)
+            ->setDefault('lines', 1)
             ->setAllowedTypes('raw', 'bool')
+            ->setAllowedTypes('lines', 'int')
         ;
 
         return $this;

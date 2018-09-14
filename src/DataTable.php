@@ -372,6 +372,13 @@ class DataTable
                 if($column->containsHtml()) {
                     $map[$i]['type'] = 'tinymce';
                 }
+                $lines = $column->getOption('lines');
+                if(!is_null($lines) && $lines > 1) {
+                    $map[$i]['type'] = 'textarea';
+                    $map[$i]['attr'] = [
+                        'rows' => $lines
+                    ];
+                }
                 ++$i;
             }
         }
