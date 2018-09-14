@@ -46,8 +46,7 @@
             }).done(function(data) {
                 var baseState;
 
-                console.log(data.options.columns.length);
-                function createRenderFunction(map) {
+                function createMapRenderFunction(map) {
                     return function ( value, type, row, meta ) {
                         if(map[value]) {
                             return map[value];
@@ -55,13 +54,26 @@
                         return '';
                     }
                 }
-                for(var i = 0; i < data.options.columns.length; ++i) {
-                    if(data.options.columns[i].render) {
-                        var map = data.options.columns[i].render;
-                        data.options.columns[i].render = createRenderFunction(map);
+                function createSubstrRenderFunction(length) {
+                    return function ( value, type, row, meta ) {
+                        if(value.length > length) {
+                            return value.substring(0, length) + '...';
+                        }
+                        return value;
                     }
                 }
-                console.log(data.options.columns);
+                for(var i = 0; i < data.options.columns.length; ++i) {
+                    if(data.options.columns[i].render) {
+                        if(Array.isArray(data.options.columns[i].render)) {
+                            var map = data.options.columns[i].render;
+                            data.options.columns[i].render = createMapRenderFunction(map);
+                        } else if(Number.isInteger(data.options.columns[i].render)) {
+                            var length = data.options.columns[i].render;
+                            console.log(length);
+                            data.options.columns[i].render = createSubstrRenderFunction(length);
+                        }
+                    }
+                }
                 // Merge all options from different sources together and add the Ajax loader
                 var dtOpts = $.extend({}, data.options, config.options, options, persistOptions, {
                     ajax: function (request, drawCallback, settings) {
@@ -97,7 +109,6 @@
                     var editorOpts = $.extend({}, data.editorOptions, editorOptions);
                     editorOpts['table'] = '#' + config.name;
                     editorOpts['ajax'] = config.url;
-                    console.log(editorOpts);
                     editor = new $.fn.dataTable.Editor(editorOpts);
                 }
                 if (config.state !== 'none') {

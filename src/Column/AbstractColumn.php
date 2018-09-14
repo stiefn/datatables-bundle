@@ -135,7 +135,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('globalSearchable',  ['null', 'boolean'])
             ->setAllowedTypes('filter', ['null', AbstractFilter::class])
             ->setAllowedTypes('className', ['null', 'string'])
-            ->setAllowedTypes('render', ['null', 'array'])
+            ->setAllowedTypes('render', ['null', 'int', 'array'])
             ->setAllowedTypes('operator', ['string'])
             ->setAllowedTypes('leftExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
