@@ -29,4 +29,8 @@ class HtmlColumn extends TextColumn
     {
         return true;
     }
+
+    public function containsHtml(): bool {
+        return true;
+    }
 }

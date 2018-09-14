@@ -337,4 +337,8 @@ abstract class AbstractColumn
         return $this->options['render'];
     }
 
+    public function containsHtml(): bool {
+        return false;
+    }
+
 }

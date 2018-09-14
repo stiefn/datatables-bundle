@@ -369,6 +369,9 @@ class DataTable
                     }
                     $map[$i]['options'] = $mapping;
                 }
+                if($column->containsHtml()) {
+                    $map[$i]['type'] = 'tinymce';
+                }
                 ++$i;
             }
         }
