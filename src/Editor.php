@@ -30,6 +30,7 @@ class Editor {
             case 'edit':
 
             case 'remove':
+            return $this->remove($em, $dataTable, $state, $derivedFields);
 
             case 'upload':
         }
@@ -61,6 +62,23 @@ class Editor {
         return [
             'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
         ];
+    }
+
+    private function remove(
+        EntityManagerInterface $em,
+        DataTable $dataTable,
+        EditorState $state,
+        array $derivedFields
+    ): array {
+        $data = $state->getData();
+        $ids = [];
+        foreach($data as $row) {
+            $ids[] = $row['id'];
+        }
+        $q = $em->createQuery('DELETE FROM ' . $dataTable->getEntityType() . ' o WHERE o.id IN (' .
+            implode(', ', $ids) . ')');
+        $numDeleted = $q->execute();
+        return [];
     }
 
     private function validate($object): array {
