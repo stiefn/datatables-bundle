@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Omines\DataTablesBundle\Column;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Omines\DataTablesBundle\DataTable;
 
 /**
  * MapColumn.
@@ -59,7 +60,7 @@ class MapColumn extends TextColumn
         return $this;
     }
 
-    public function getMapping() {
+    public function getMapping(): array {
         return $this->options['map'];
     }
 }

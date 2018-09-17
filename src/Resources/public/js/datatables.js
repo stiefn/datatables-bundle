@@ -64,12 +64,12 @@
                 }
                 for(var i = 0; i < data.options.columns.length; ++i) {
                     if(data.options.columns[i].render) {
-                        if(Array.isArray(data.options.columns[i].render)) {
+                        if(Array.isArray(data.options.columns[i].render)
+                            || typeof data.options.columns[i].render === 'object') {
                             var map = data.options.columns[i].render;
                             data.options.columns[i].render = createMapRenderFunction(map);
                         } else if(Number.isInteger(data.options.columns[i].render)) {
                             var length = data.options.columns[i].render;
-                            console.log(length);
                             data.options.columns[i].render = createSubstrRenderFunction(length);
                         }
                     }
