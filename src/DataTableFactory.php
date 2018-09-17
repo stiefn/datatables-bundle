@@ -29,17 +29,20 @@ class DataTableFactory
     /** @var array */
     protected $config;
 
+    protected $editor;
+
     /**
      * DataTableFactory constructor.
      *
      * @param array $config
      * @param DataTableRendererInterface $renderer
      */
-    public function __construct(array $config, DataTableRendererInterface $renderer, Instantiator $instantiator)
+    public function __construct(array $config, DataTableRendererInterface $renderer, Instantiator $instantiator, Editor $editor)
     {
         $this->config = $config;
         $this->renderer = $renderer;
         $this->instantiator = $instantiator;
+        $this->editor = $editor;
     }
 
     /**
@@ -57,6 +60,7 @@ class DataTableFactory
             ->setTranslationDomain($config['translation_domain'] ?? 'messages')
             ->setLanguageFromCDN($config['language_from_cdn'] ?? true)
             ->setTemplate($config['template'] ?? DataTable::DEFAULT_TEMPLATE, $config['template_parameters'] ?? [])
+            ->setEditor($this->editor)
         ;
     }
 

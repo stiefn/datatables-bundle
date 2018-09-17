@@ -26,3 +26,6 @@ datatable:
         aria:
             sortAscending:  ": zu aktivieren, um Spalte aufsteigend zu sortieren"
             sortDescending: ": zu aktivieren, um Spalte absteigend sortieren"
+    editor:
+        error:
+            emptyData: "Inkorrektes Datenformat gesendet"

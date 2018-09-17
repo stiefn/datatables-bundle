@@ -95,11 +95,20 @@ class DataTable
     /** @var bool */
     protected $useEditor = false;
 
+    /** @var string */
+    protected $entityType = null;
+
+    /** @var Editor */
+    protected $editor = null;
+
     /** @var DataTableRendererInterface */
     private $renderer;
 
     /** @var DataTableState */
     private $state;
+
+    /** @var EditorState */
+    private $editorState;
 
     /** @var Instantiator */
     private $instantiator;
@@ -272,12 +281,20 @@ class DataTable
     }
 
     /**
+     * @return bool
+     */
+    public function isEditorCallback(): bool
+    {
+        return (null !== $this->editorState);
+    }
+
+    /**
      * @param Request $request
      * @return $this
      */
     public function handleRequest(Request $request): self
     {
-        switch ($this->getMethod()) {
+        switch ($request->getMethod()) {
             case Request::METHOD_GET:
                 $parameters = $request->query;
                 break;
@@ -288,10 +305,16 @@ class DataTable
                 throw new InvalidConfigurationException(sprintf("Unknown request method '%s'", $this->getMethod()));
         }
         if ($this->getName() === $parameters->get('_dt')) {
+            // handle request for datatable drawing
             if (null === $this->state) {
                 $this->state = DataTableState::fromDefaults($this);
             }
             $this->state->applyParameters($parameters);
+        } else if($parameters->get('action') !== null) {
+            // handle request for datatable editor actions
+            if (null === $this->editorState) {
+                $this->editorState = new EditorState($parameters->get('action'), $parameters->get('data'));
+            }
         }
 
         return $this;
@@ -322,6 +345,15 @@ class DataTable
         }
 
         return JsonResponse::create($response);
+    }
+
+    public function getEditorResponse(array $derivedFields = []): JsonResponse {
+        if (null === $this->editorState) {
+            throw new InvalidStateException('No Editor state available, did you call handleRequest?');
+        }
+
+        return JsonResponse::create($this->editor->process($this, $this->editorState, $derivedFields));
+
     }
 
     protected function getInitialResponse(): array
@@ -425,6 +457,10 @@ class DataTable
         return $this->options[$name] ?? null;
     }
 
+    public function getEntityType(): string {
+        return $this->entityType;
+    }
+
     /**
      * @param AdapterInterface $adapter
      * @param array|null $options
@@ -469,6 +505,26 @@ class DataTable
     public function useEditor(bool $useEditor): self
     {
         $this->useEditor = $useEditor;
+
+        return $this;
+    }
+
+    /**
+     * @param Editor $editor
+     */
+    public function setEditor(Editor $editor) {
+        $this->editor = $editor;
+
+        return $this;
+    }
+
+    /**
+     * @param string $entityType
+     * @return $this
+     */
+    public function setEntityType(string $entityType): self
+    {
+        $this->entityType = $entityType;
 
         return $this;
     }
