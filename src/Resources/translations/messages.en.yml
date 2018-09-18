@@ -28,4 +28,5 @@ datatable:
             sortDescending: ": activate to sort column descending"
     editor:
         error:
-            emptyData: "Inkorrect data format"
+            emptyData: "Incorrect data format"
+            emptyUpload: "Incorrect file upload"

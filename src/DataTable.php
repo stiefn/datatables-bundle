@@ -313,7 +313,17 @@ class DataTable
         } else if($parameters->get('action') !== null) {
             // handle request for datatable editor actions
             if (null === $this->editorState) {
-                $this->editorState = new EditorState($parameters->get('action'), $parameters->get('data'));
+                $this->editorState = new EditorState();
+
+                if($parameters->get('data')) {
+                    $this->editorState->setDataAction($parameters->get('action'), $parameters->get('data'));
+                } else if($request->files->get('upload') !== null) {
+                    $this->editorState->setUploadAction(
+                        $parameters->get('action'),
+                        $parameters->get('uploadField'),
+                        $request->files->get('upload')
+                    );
+                }
             }
         }
 
@@ -358,19 +368,21 @@ class DataTable
 
     protected function getInitialResponse(): array
     {
+        $map = [];
+        foreach($this->getColumns() as $column) {
+            if(!$column->isHidden()) {
+                $map[] = [
+                    'data' => $column->getName(),
+                    'orderable' => $column->isOrderable(),
+                    'searchable' => $column->isSearchable(),
+                    'visible' => $column->isVisible(),
+                    'className' => $column->getClassName(),
+                    'render' => $column->getRender()
+                ];
+            }
+        }
         return array_merge($this->getOptions(), [
-            'columns' => array_map(
-                function (AbstractColumn $column) {
-                    return [
-                        'data' => $column->getName(),
-                        'orderable' => $column->isOrderable(),
-                        'searchable' => $column->isSearchable(),
-                        'visible' => $column->isVisible(),
-                        'className' => $column->getClassName(),
-                        'render' => $column->getRender()
-                    ];
-                }, $this->getColumns()
-            ),
+            'columns' => $map
         ]);
     }
 
@@ -410,6 +422,9 @@ class DataTable
                     $map[$i]['attr'] = [
                         'rows' => $lines
                     ];
+                }
+                if($column->isHidden()) {
+                    $map[$i]['type'] = 'hidden';
                 }
                 ++$i;
             }

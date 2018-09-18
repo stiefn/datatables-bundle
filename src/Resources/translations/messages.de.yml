@@ -29,3 +29,4 @@ datatable:
     editor:
         error:
             emptyData: "Inkorrektes Datenformat gesendet"
+            emptyUpload: "Fehlerhafter Datei-Upload"

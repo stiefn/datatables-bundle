@@ -14,7 +14,11 @@ class Editor {
     private $translator;
     private $domain;
 
-	public function __construct(ManagerRegistry $mr, ValidatorInterface $validator, TranslatorInterface $translator) {
+	public function __construct(
+        ManagerRegistry $mr,
+        ValidatorInterface $validator,
+        TranslatorInterface $translator
+    ) {
 	    $this->managerRegistry = $mr;
 	    $this->validator = $validator;
 	    $this->translator = $translator;
@@ -30,9 +34,10 @@ class Editor {
             case 'edit':
 
             case 'remove':
-            return $this->remove($em, $dataTable, $state, $derivedFields);
+                return $this->remove($em, $dataTable, $state, $derivedFields);
 
             case 'upload':
+                return $this->upload($em, $dataTable, $state, $derivedFields);
         }
     }
 
@@ -71,14 +76,52 @@ class Editor {
         array $derivedFields
     ): array {
         $data = $state->getData();
-        $ids = [];
-        foreach($data as $row) {
-            $ids[] = $row['id'];
+        if(is_array($data) && count($data) > 0) {
+            $ids = [];
+            foreach ($data as $row) {
+                $ids[] = $row['id'];
+            }
+            $q = $em->createQuery('DELETE FROM ' . $dataTable->getEntityType() . ' o WHERE o.id IN (' .
+                implode(', ', $ids) . ')');
+            $numDeleted = $q->execute();
+            return [];
         }
-        $q = $em->createQuery('DELETE FROM ' . $dataTable->getEntityType() . ' o WHERE o.id IN (' .
-            implode(', ', $ids) . ')');
-        $numDeleted = $q->execute();
-        return [];
+        return [
+            'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+        ];
+    }
+
+    private function upload(
+        EntityManagerInterface $em,
+        DataTable $dataTable,
+        EditorState $state,
+        array $derivedFields
+    ): array {
+	    $uploadField = $state->getUploadField();
+        $upload = $state->getUpload();
+        if($uploadField !== null && $upload !== null) {
+            foreach($dataTable->getColumns() as $column) {
+                if ($column->getName() === $uploadField) {
+                    if($column->getUploadHandler() !== null) {
+                        return call_user_func($column->getUploadHandler(), $upload);
+                    }
+                    // TODO: move uploaded file and return
+                    return [
+                        'upload' => [
+                            'id' => 1
+                        ],
+                        'files' => [
+                            'file' => [
+                                1 => ''
+                            ]
+                        ]
+                    ];
+                }
+            }
+        }
+        return [
+            'error' => $this->translator->trans('datatable.editor.error.emptyUpload', [], $this->domain)
+        ];
     }
 
     private function validate($object): array {
@@ -115,10 +158,12 @@ class Editor {
                 $object->$method($value);
             }
         }
+        return $object;
     }
 
     private function objectToArray(DataTable $dataTable, $object) {
 	    $array = [];
+        $type = $dataTable->getEntityType();
         foreach($dataTable->getColumns() as $column) {
             $method = 'get' . ucfirst($column->getName());
             if(method_exists($type, $method)) {

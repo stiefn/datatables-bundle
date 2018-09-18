@@ -122,7 +122,9 @@ abstract class AbstractColumn
                 'rightExpr' => null,
                 'editable' => true,
                 'file' => false,
-                'fileMany' => false
+                'fileMany' => false,
+                'uploadHandler' => null,
+                'hidden' => false
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -142,6 +144,8 @@ abstract class AbstractColumn
             ->setAllowedTypes('editable', ['null', 'boolean'])
             ->setAllowedTypes('file', ['null', 'boolean'])
             ->setAllowedTypes('fileMany', ['null', 'boolean'])
+            ->setAllowedTypes('uploadHandler', ['null', 'callable'])
+            ->setAllowedTypes('hidden', ['boolean'])
         ;
 
         return $this;
@@ -313,6 +317,10 @@ abstract class AbstractColumn
         return null;
     }
 
+    public function isHidden(): bool {
+        return $this->options['hidden'];
+    }
+
     /**
      * @param string $value
      * @return bool
@@ -335,6 +343,10 @@ abstract class AbstractColumn
     public function isFileMany(): bool
     {
         return $this->options['fileMany'];
+    }
+
+    public function getUploadHandler(): ?callable {
+        return $this->options['uploadHandler'];
     }
 
     public function getMapping(): array {
