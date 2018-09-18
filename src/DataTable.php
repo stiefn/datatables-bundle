@@ -345,6 +345,7 @@ class DataTable
             'recordsTotal' => $resultSet->getTotalRecords(),
             'recordsFiltered' => $resultSet->getTotalDisplayRecords(),
             'data' => iterator_to_array($resultSet->getData()),
+            'files'
         ];
         if ($this->state->isInitial()) {
             $response['options'] = $this->getInitialResponse();

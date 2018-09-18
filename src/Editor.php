@@ -32,6 +32,7 @@ class Editor {
                 return $this->create($em, $dataTable, $state, $derivedFields);
 
             case 'edit':
+                return $this->edit($em, $dataTable, $state, $derivedFields);
 
             case 'remove':
                 return $this->remove($em, $dataTable, $state, $derivedFields);
@@ -50,7 +51,9 @@ class Editor {
 	    $data = $state->getData();
 	    if(is_array($data) && count($data) > 0) {
 	        $objectData = $data[0];
-            $object = $this->createObject($dataTable, $objectData, $derivedFields);
+            $type = $dataTable->getEntityType();
+            $object = new $type();
+            $object = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
             $errors = $this->validate($object);
             if(!empty($errors)) {
                 return $errors;
@@ -60,6 +63,35 @@ class Editor {
             $output = [
                 0 => $this->objectToArray($dataTable, $object)
             ];
+            return [
+                'data' => $output
+            ];
+        }
+        return [
+            'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+        ];
+    }
+
+    private function edit(
+        EntityManagerInterface $em,
+        DataTable $dataTable,
+        EditorState $state,
+        array $derivedFields
+    ): array {
+        $data = $state->getData();
+        $repository = $em->getRepository($dataTable->getEntityType());
+        if(is_array($data) && count($data) > 0) {
+            $output = [];
+            foreach($data as $id => $objectData) {
+                $object = $repository->findOneBy(['id' => $id]);
+                $object = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
+                $errors = $this->validate($object);
+                if(!empty($errors)) {
+                    return $errors;
+                }
+                $output[$id] = $this->objectToArray($dataTable, $object);
+            }
+            $em->flush();
             return [
                 'data' => $output
             ];
@@ -141,20 +173,18 @@ class Editor {
         return [];
     }
 
-    private function createObject(DataTable $dataTable, array $objectData, array $derivedFields) {
-        $type = $dataTable->getEntityType();
-        $object = new $type();
+    private function mergeObject($object, DataTable $dataTable, array $objectData, array $derivedFields) {
         foreach($dataTable->getColumns() as $column) {
-            if($column->getName() !== 'id') {
+            if(isset($objectData[$column->getName()])) {
                 $method = 'set' . ucfirst($column->getName());
-                if(method_exists($type, $method)) {
+                if(method_exists($object, $method)) {
                     $object->$method($objectData[$column->getName()]);
                 }
             }
         }
         foreach($derivedFields as $field => $value) {
             $method = 'set' . ucfirst($field);
-            if(method_exists($type, $method)) {
+            if(method_exists($object, $method)) {
                 $object->$method($value);
             }
         }
