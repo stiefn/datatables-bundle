@@ -55,7 +55,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         $this->metadata = $metadata;
 
         $this->entityName = $this->metadata->getName();
-        $this->entityShortName = mb_strtolower($this->metadata->getReflectionClass()->getShortName());
+        $this->entityShortName = '_' . mb_strtolower($this->metadata->getReflectionClass()->getShortName());
     }
 
     /**
