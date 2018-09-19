@@ -27,8 +27,11 @@ class BoolColumn extends AbstractColumn
     {
         parent::initialize($name, $index, $options, $dataTable);
 
-        if(!isset($options['render'])) {
-            $this->options['render'] = $this->getMapping();
+        if(!isset($options['map'])) {
+            $this->options['map'] = [
+                0 => $this->options['falseValue'],
+                1 => $this->options['trueValue']
+            ];
         }
     }
 
@@ -59,9 +62,11 @@ class BoolColumn extends AbstractColumn
             ->setDefault('trueValue', 'true')
             ->setDefault('falseValue', 'false')
             ->setDefault('nullValue', 'null')
+            ->setDefault('map', [])
             ->setAllowedTypes('trueValue', 'string')
             ->setAllowedTypes('falseValue', 'string')
             ->setAllowedTypes('nullValue', 'string')
+            ->setAllowedTypes('map', 'array')
         ;
 
         return $this;
@@ -101,10 +106,7 @@ class BoolColumn extends AbstractColumn
         return ($value == $this->getTrueValue()) || ($value == $this->getFalseValue());
     }
 
-    public function getMapping(): array {
-        return [
-            0 => $this->options['falseValue'],
-            1 => $this->options['trueValue']
-        ];
+    public function getMap(): ?array {
+        return $this->options['map'];
     }
 }

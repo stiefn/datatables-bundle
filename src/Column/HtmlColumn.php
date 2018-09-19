@@ -21,7 +21,7 @@ class HtmlColumn extends TextColumn
         return $this;
     }
 
-    public function getRender()
+    public function getRenderedLength(): ?int
     {
         return $this->options['renderedLength'];
     }

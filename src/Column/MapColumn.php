@@ -27,8 +27,8 @@ class MapColumn extends TextColumn
     {
         parent::initialize($name, $index, $options, $dataTable);
 
-        if(!isset($options['render'])) {
-            $this->options['render'] = $this->getMapping();
+        if(!isset($options['map'])) {
+            $this->options['map'] = $this->getMap();
         }
     }
 
@@ -37,7 +37,7 @@ class MapColumn extends TextColumn
      */
     public function normalize($value): string
     {
-        return $value;
+        return (string) $value;
     }
 
     /**
@@ -60,7 +60,7 @@ class MapColumn extends TextColumn
         return $this;
     }
 
-    public function getMapping(): array {
+    public function getMap(): ?array {
         return $this->options['map'];
     }
 }

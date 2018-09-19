@@ -14,6 +14,7 @@ namespace Omines\DataTablesBundle;
 
 use Omines\DataTablesBundle\DependencyInjection\Instantiator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DataTableFactory
 {
@@ -31,18 +32,26 @@ class DataTableFactory
 
     protected $editor;
 
+    protected $translator;
+
     /**
      * DataTableFactory constructor.
      *
      * @param array $config
      * @param DataTableRendererInterface $renderer
      */
-    public function __construct(array $config, DataTableRendererInterface $renderer, Instantiator $instantiator, Editor $editor)
-    {
+    public function __construct(
+        array $config,
+        DataTableRendererInterface $renderer, #
+        Instantiator $instantiator,
+        Editor $editor,
+        TranslatorInterface $translator
+    ) {
         $this->config = $config;
         $this->renderer = $renderer;
         $this->instantiator = $instantiator;
         $this->editor = $editor;
+        $this->translator = $translator;
     }
 
     /**
@@ -61,6 +70,7 @@ class DataTableFactory
             ->setLanguageFromCDN($config['language_from_cdn'] ?? true)
             ->setTemplate($config['template'] ?? DataTable::DEFAULT_TEMPLATE, $config['template_parameters'] ?? [])
             ->setEditor($this->editor)
+            ->setTranslator($this->translator)
         ;
     }
 

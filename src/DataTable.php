@@ -12,9 +12,12 @@ declare(strict_types=1);
 
 namespace Omines\DataTablesBundle;
 
+use Mpdf\Tag\Bookmark;
 use Omines\DataTablesBundle\Adapter\AdapterInterface;
 use Omines\DataTablesBundle\Adapter\ResultSetInterface;
 use Omines\DataTablesBundle\Column\AbstractColumn;
+use Omines\DataTablesBundle\Column\BoolColumn;
+use Omines\DataTablesBundle\Column\MapColumn;
 use Omines\DataTablesBundle\DependencyInjection\Instantiator;
 use Omines\DataTablesBundle\Exception\InvalidArgumentException;
 use Omines\DataTablesBundle\Exception\InvalidConfigurationException;
@@ -22,6 +25,7 @@ use Omines\DataTablesBundle\Exception\InvalidStateException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * DataTable.
@@ -112,6 +116,9 @@ class DataTable
 
     /** @var Instantiator */
     private $instantiator;
+
+    /** @var TranslatorInterface */
+    private $translator;
 
     /**
      * DataTable constructor.
@@ -370,16 +377,25 @@ class DataTable
     protected function getInitialResponse(): array
     {
         $map = [];
+        $i = 0;
         foreach($this->getColumns() as $column) {
             if(!$column->isHidden()) {
-                $map[] = [
+                $map[$i] = [
                     'data' => $column->getName(),
                     'orderable' => $column->isOrderable(),
                     'searchable' => $column->isSearchable(),
                     'visible' => $column->isVisible(),
-                    'className' => $column->getClassName(),
-                    'render' => $column->getRender()
+                    'className' => $column->getClassName()
                 ];
+                if($column->isEditable()) {
+                    $map[$i]['className'] .= ' editable';
+                }
+                if($column->getMap() !== null) {
+                    $map[$i]['map'] = $column->getMap();
+                } else if($column->getRenderedLength() !== null) {
+                    $map[$i]['renderedLength'] = $column->getRenderedLength();
+                }
+                ++$i;
             }
         }
         return array_merge($this->getOptions(), [
@@ -399,14 +415,20 @@ class DataTable
                 ];
                 if($column->isFile()) {
                     $map[$i]['type'] = 'upload';
+                    $map[$i]['uploadText'] = $this->translator->trans('datatable.editor.fileUpload.uploadText', [], $this->translationDomain);
+                    $map[$i]['dragDropText'] = $this->translator->trans('datatable.editor.fileUpload.dragDropText', [], $this->translationDomain);
+                    $map[$i]['noFileText'] = $this->translator->trans('datatable.editor.fileUpload.noFileText', [], $this->translationDomain);
                 }
                 if($column->isFileMany()) {
                     $map[$i]['type'] = 'uploadMany';
+                    $map[$i]['uploadText'] = $this->translator->trans('datatable.editor.fileUpload.uploadText', [], $this->translationDomain);
+                    $map[$i]['dragDropText'] = $this->translator->trans('datatable.editor.fileUpload.dragDropText', [], $this->translationDomain);
+                    $map[$i]['noFileText'] = $this->translator->trans('datatable.editor.fileUpload.noFileText', [], $this->translationDomain);
                 }
-                if(!empty($column->getMapping())) {
+                if($column->getMap() !== null) {
                     $map[$i]['type'] = 'select';
                     $mapping = [];
-                    foreach($column->getMapping() as $key => $value) {
+                    foreach($column->getMap() as $key => $value) {
                         $mapping[] = [
                             'label' => $value,
                             'value' => $key
@@ -426,6 +448,9 @@ class DataTable
                 }
                 if($column->isHidden()) {
                     $map[$i]['type'] = 'hidden';
+                }
+                if($column->isDate()) {
+                    $map[$i]['type'] = 'date';
                 }
                 ++$i;
             }
@@ -600,6 +625,13 @@ class DataTable
     public function setTranslationDomain(string $translationDomain): self
     {
         $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
+    public function setTranslator(TranslatorInterface $translator): self
+    {
+        $this->translator = $translator;
 
         return $this;
     }

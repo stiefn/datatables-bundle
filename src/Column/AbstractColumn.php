@@ -124,6 +124,7 @@ abstract class AbstractColumn
                 'file' => false,
                 'fileMany' => false,
                 'uploadHandler' => null,
+                'dataHandler' => null,
                 'hidden' => false
             ])
             ->setAllowedTypes('label', ['null', 'string'])
@@ -144,7 +145,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('editable', ['null', 'boolean'])
             ->setAllowedTypes('file', ['null', 'boolean'])
             ->setAllowedTypes('fileMany', ['null', 'boolean'])
-            ->setAllowedTypes('uploadHandler', ['null', 'callable'])
+            ->setAllowedTypes('dataHandler', ['null', 'callable'])
             ->setAllowedTypes('hidden', ['boolean'])
         ;
 
@@ -349,8 +350,8 @@ abstract class AbstractColumn
         return $this->options['uploadHandler'];
     }
 
-    public function getMapping(): array {
-        return [];
+    public function getDataHandler(): ?callable {
+        return $this->options['dataHandler'];
     }
 
     public function getRender() {
@@ -359,6 +360,18 @@ abstract class AbstractColumn
 
     public function containsHtml(): bool {
         return false;
+    }
+
+    public function getRenderedLength(): ?int {
+        return null;
+    }
+
+    public function isDate(): bool {
+        return false;
+    }
+
+    public function getMap(): ?array {
+        return null;
     }
 
 }

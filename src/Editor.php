@@ -53,10 +53,13 @@ class Editor {
 	        $objectData = $data[0];
             $type = $dataTable->getEntityType();
             $object = new $type();
-            $object = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
-            $errors = $this->validate($object);
+            $mergeErrors = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
+            $validationErrors = $this->validate($object);
+            $errors = array_merge($mergeErrors, $validationErrors);
             if(!empty($errors)) {
-                return $errors;
+                return [
+                    'fieldErrors' => $errors
+                ];
             }
             $em->persist($object);
             $em->flush();
@@ -84,10 +87,13 @@ class Editor {
             $output = [];
             foreach($data as $id => $objectData) {
                 $object = $repository->findOneBy(['id' => $id]);
-                $object = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
-                $errors = $this->validate($object);
+                $mergeErrors = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
+                $validationErrors = $this->validate($object);
+                $errors = array_merge($mergeErrors, $validationErrors);
                 if(!empty($errors)) {
-                    return $errors;
+                    return [
+                        'fieldErrors' => $errors
+                    ];
                 }
                 $output[$id] = $this->objectToArray($dataTable, $object);
             }
@@ -159,11 +165,9 @@ class Editor {
     private function validate($object): array {
         $errors = $this->validator->validate($object);
         if(count($errors) > 0) {
-            $fieldErrors = [
-                'fieldErrors' => []
-            ];
+            $fieldErrors = [];
             foreach($errors as $error) {
-                $fieldErrors['fieldErrors'][] = [
+                $fieldErrors[] = [
                     'name' => $error->getPropertyPath(),
                     'status' => $error->getMessage()
                 ];
@@ -174,10 +178,30 @@ class Editor {
     }
 
     private function mergeObject($object, DataTable $dataTable, array $objectData, array $derivedFields) {
+        $reflect = new \ReflectionClass(get_class($object));
+        $errors = [];
         foreach($dataTable->getColumns() as $column) {
             if(isset($objectData[$column->getName()])) {
                 $method = 'set' . ucfirst($column->getName());
                 if(method_exists($object, $method)) {
+                    $handler = $column->getDataHandler();
+                    if($handler !== null) {
+                        $objectData[$column->getName()] = $handler($objectData[$column->getName()]);
+                    }
+                    $type = gettype($objectData[$column->getName()]);
+                    $setterType = $reflect->getMethod($method)->getParameters()[0]->getType();
+                    if($setterType !== null && $setterType->getName() !== 'string') {
+                        switch($setterType->getName()) {
+                            case 'int':
+                                if((string)intval($objectData[$column->getName()]) !== (string)$objectData[$column->getName()]) {
+                                    $errors[] = [
+                                        'name' => $column->getName(),
+                                        'status' => $this->translator->trans('datatable.editor.error.integerRequired', [], $this->domain)
+                                    ];
+                                    continue 2;
+                                }
+                        }
+                    }
                     $object->$method($objectData[$column->getName()]);
                 }
             }
@@ -188,7 +212,8 @@ class Editor {
                 $object->$method($value);
             }
         }
-        return $object;
+
+        return $errors;
     }
 
     private function objectToArray(DataTable $dataTable, $object) {

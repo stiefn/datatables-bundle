@@ -30,3 +30,8 @@ datatable:
         error:
             emptyData: "Inkorrektes Datenformat gesendet"
             emptyUpload: "Fehlerhafter Datei-Upload"
+            integerRequired: "Dieser Wert muss eine Zahl sein"
+        fileUpload:
+            uploadText: "Datei wählen..."
+            dragDropText: "Datei hier per Drag&Drop ablegen"
+            noFileText: "Keine Datei ausgewählt"
