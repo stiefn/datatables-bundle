@@ -62,14 +62,6 @@
                         return value;
                     }
                 }
-                function createDateRenderFunction() {
-                    return function ( value, type, row, meta ) {
-                        var date = new Date(value * 1000);
-                        return ('0' + date.getDay()).slice(-2) + '.'
-                            + ('0' + (date.getMonth()+1)).slice(-2) + '.'
-                            + date.getFullYear();
-                    }
-                }
                 for(var i = 0; i < data.options.columns.length; ++i) {
                     if(data.options.columns[i].map) {
                         var map = data.options.columns[i].map;
@@ -77,8 +69,6 @@
                     } else if(data.options.columns[i].renderedLength) {
                         var length = data.options.columns[i].renderedLength;
                         data.options.columns[i].render = createSubstrRenderFunction(length);
-                    } else if(data.options.columns[i].isDate) {
-                        data.options.columns[i].render = createDateRenderFunction();
                     }
                 }
                 // Merge all options from different sources together and add the Ajax loader
@@ -151,7 +141,8 @@
                 if(data.editorOptions) {
                     fulfill({
                         'dt': dt,
-                        'editor': editor
+                        'editor': editor,
+                        'editorButtons': data.editorButtons
                     })
                 }
                 fulfill({

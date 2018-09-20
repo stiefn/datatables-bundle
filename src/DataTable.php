@@ -120,6 +120,9 @@ class DataTable
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var string[] */
+    private $editorButtons = [];
+
     /**
      * DataTable constructor.
      *
@@ -155,6 +158,10 @@ class DataTable
         $this->columnsByName[$name] = $column;
 
         return $this;
+    }
+
+    public function setEditorButtons(array $editorButtons) {
+        $this->editorButtons = $editorButtons;
     }
 
     /**
@@ -358,6 +365,7 @@ class DataTable
             $response['options'] = $this->getInitialResponse();
             if($this->getUseEditor()) {
                 $response['editorOptions'] = $this->getInitialEditorResponse();
+                $response['editorButtons'] = $this->editorButtons;
             }
             $response['template'] = $this->renderer->renderDataTable($this, $this->template, $this->templateParams);
         }
