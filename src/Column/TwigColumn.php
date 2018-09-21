@@ -46,6 +46,7 @@ class TwigColumn extends AbstractColumn
         return $this->twig->render($this->getTemplate(), [
             'row' => $context,
             'value' => $value,
+            'data' => $this->options['templateData']
         ]);
     }
 
@@ -65,8 +66,10 @@ class TwigColumn extends AbstractColumn
         parent::configureOptions($resolver);
 
         $resolver
+            ->setDefault('templateData', [])
             ->setRequired('template')
             ->setAllowedTypes('template', 'string')
+            ->setAllowedTypes('templateData', 'array')
         ;
 
         return $this;
