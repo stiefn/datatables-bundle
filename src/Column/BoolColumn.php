@@ -33,6 +33,10 @@ class BoolColumn extends AbstractColumn
                 1 => $this->options['trueValue']
             ];
         }
+        $this->options['normalizedMap'] = [
+            0 => $this->options['falseValue'],
+            1 => $this->options['trueValue']
+        ];
     }
 
     /**
@@ -61,12 +65,14 @@ class BoolColumn extends AbstractColumn
         $resolver
             ->setDefault('trueValue', 'true')
             ->setDefault('falseValue', 'false')
-            ->setDefault('nullValue', 'null')
+            ->setDefault('nullValue', '')
             ->setDefault('map', [])
+            ->setDefault('normalizedMap', null)
             ->setAllowedTypes('trueValue', 'string')
             ->setAllowedTypes('falseValue', 'string')
             ->setAllowedTypes('nullValue', 'string')
             ->setAllowedTypes('map', 'array')
+            ->setAllowedTypes('normalizedMap', ['null', 'array'])
         ;
 
         return $this;
@@ -108,5 +114,12 @@ class BoolColumn extends AbstractColumn
 
     public function getMap(): ?array {
         return $this->options['map'];
+    }
+
+    public function getNormalizedMap(): ?array {
+        if($this->options['normalizedMap'] === null) {
+            return $this->getMap();
+        }
+        return $this->options['normalizedMap'];
     }
 }

@@ -125,7 +125,8 @@ abstract class AbstractColumn
                 'fileMany' => false,
                 'uploadHandler' => null,
                 'dataHandler' => null,
-                'hidden' => false
+                'hidden' => false,
+                'type' => null
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -147,6 +148,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('fileMany', ['null', 'boolean'])
             ->setAllowedTypes('dataHandler', ['null', 'callable'])
             ->setAllowedTypes('hidden', ['boolean'])
+            ->setAllowedTypes('type', ['null', 'string'])
         ;
 
         return $this;
@@ -371,6 +373,10 @@ abstract class AbstractColumn
     }
 
     public function getMap(): ?array {
+        return null;
+    }
+
+    public function getNormalizedMap(): ?array {
         return null;
     }
 

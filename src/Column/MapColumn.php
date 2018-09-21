@@ -51,9 +51,11 @@ class MapColumn extends TextColumn
             ->setDefaults([
                 'default' => null,
                 'map' => null,
+                'normalizedMap' => null
             ])
             ->setAllowedTypes('default', ['null', 'string'])
             ->setAllowedTypes('map', 'array')
+            ->setAllowedTypes('normalizedMap', ['null', 'array'])
             ->setRequired('map')
         ;
 
@@ -62,5 +64,12 @@ class MapColumn extends TextColumn
 
     public function getMap(): ?array {
         return $this->options['map'];
+    }
+
+    public function getNormalizedMap(): ?array {
+        if($this->options['normalizedMap'] === null) {
+            return $this->getMap();
+        }
+        return $this->options['normalizedMap'];
     }
 }

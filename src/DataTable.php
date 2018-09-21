@@ -358,8 +358,7 @@ class DataTable
             'draw' => $this->state->getDraw(),
             'recordsTotal' => $resultSet->getTotalRecords(),
             'recordsFiltered' => $resultSet->getTotalDisplayRecords(),
-            'data' => iterator_to_array($resultSet->getData()),
-            'files'
+            'data' => iterator_to_array($resultSet->getData())
         ];
         if ($this->state->isInitial()) {
             $response['options'] = $this->getInitialResponse();
@@ -433,10 +432,10 @@ class DataTable
                     $map[$i]['dragDropText'] = $this->translator->trans('datatable.editor.fileUpload.dragDropText', [], $this->translationDomain);
                     $map[$i]['noFileText'] = $this->translator->trans('datatable.editor.fileUpload.noFileText', [], $this->translationDomain);
                 }
-                if($column->getMap() !== null) {
+                if($column->getNormalizedMap() !== null) {
                     $map[$i]['type'] = 'select';
                     $mapping = [];
-                    foreach($column->getMap() as $key => $value) {
+                    foreach($column->getNormalizedMap() as $key => $value) {
                         $mapping[] = [
                             'label' => $value,
                             'value' => $key
@@ -459,6 +458,9 @@ class DataTable
                 }
                 if($column->isDate()) {
                     $map[$i]['type'] = 'date';
+                }
+                if($column->getOption('type') !== null) {
+                    $map[$i]['type'] = $column->getOption('type');
                 }
                 ++$i;
             }
