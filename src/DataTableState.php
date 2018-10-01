@@ -122,8 +122,8 @@ class DataTableState
             $column = $this->dataTable->getColumn((int) $key);
             $value = $this->isInitial ? $search : $search['search']['value'];
 
-            if ($column->isSearchable() && strlen($value) > 0 && null !== $column->getFilter() && $column->getFilter()->isValidValue($value)) {
-                $this->setColumnSearch($column, $value);
+            if ($column->isSearchable() && (is_array($value) || strlen($value) > 0) && null !== $column->getFilter() && $column->getFilter()->isValidValue($value)) {
+                $this->setColumnSearch($column, $column->getFilter()->normalizeValue($value));
             }
         }
     }
@@ -263,7 +263,7 @@ class DataTableState
      * @param bool $isRegex
      * @return $this
      */
-    public function setColumnSearch(AbstractColumn $column, string $search, bool $isRegex = false): self
+    public function setColumnSearch(AbstractColumn $column, $search, bool $isRegex = false): self
     {
         $this->searchColumns[$column->getName()] = ['column' => $column, 'search' => $search, 'regex' => $isRegex];
 

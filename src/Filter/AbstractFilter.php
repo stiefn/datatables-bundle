@@ -90,4 +90,8 @@ abstract class AbstractFilter
      * @return bool
      */
     abstract public function isValidValue($value): bool;
+
+    public function normalizeValue($value) {
+        return $value;
+    }
 }
