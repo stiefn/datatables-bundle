@@ -164,6 +164,15 @@ class DataTable
         $this->editorButtons = $editorButtons;
     }
 
+    public function hasEditorButton(string $buttonName) {
+        foreach($this->editorButtons as $button) {
+            if($button == $buttonName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @param int|string|AbstractColumn $column
      * @param string $direction

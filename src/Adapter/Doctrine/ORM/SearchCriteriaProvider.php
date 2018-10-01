@@ -46,10 +46,27 @@ class SearchCriteriaProvider implements QueryBuilderProcessorInterface
             $search = $searchInfo['search'];
 
             if (strlen($search) > 0 && null !== ($filter = $column->getFilter())) {
+                // Get the field name, if column is a join column
+                // Analogous to AutomaticQueryBuilder::getSelectColumns
+                $field = $column->getField();
+                $parts = explode('.', $column->getField());
+                if (count($parts) > 1) {
+                    $currentPart = array_shift($parts);
+                    $currentAlias = $currentPart;
+                    $isRoot = true;
+                    while (count($parts) > 1) {
+                        $previousPart = $currentPart;
+                        $currentPart = array_shift($parts);
+                        $currentAlias = ($isRoot ? '' : $previousPart . '_') . $currentPart;
+                        $isRoot = false;
+                    }
+                    $field = $currentAlias . '.' . $parts[0];
+                }
+
                 if($filter->getOperator() == 'LIKE') {
-                    $queryBuilder->andWhere($queryBuilder->expr()->like($column->getField(), $queryBuilder->expr()->literal('%' . $search . '%')));
+                    $queryBuilder->andWhere($queryBuilder->expr()->like($field, $queryBuilder->expr()->literal('%' . $search . '%')));
                 } else {
-                    $queryBuilder->andWhere(new Comparison($column->getField(), $filter->getOperator(), $queryBuilder->expr()->literal($search)));
+                    $queryBuilder->andWhere(new Comparison($field, $filter->getOperator(), $queryBuilder->expr()->literal($search)));
                 }
             }
         }

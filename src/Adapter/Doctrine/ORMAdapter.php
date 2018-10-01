@@ -248,6 +248,7 @@ class ORMAdapter extends AbstractAdapter
 
             return (int) $qb->getQuery()->getSingleScalarResult();
         }
+        
     }
 
     /**
