@@ -26,22 +26,22 @@ use Omines\DataTablesBundle\DataTableState;
 class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
 {
     /** @var EntityManagerInterface */
-    private $em;
+    protected $em;
 
     /** @var ClassMetadata */
-    private $metadata;
+    protected $metadata;
 
     /** @var string */
-    private $entityName;
+    protected $entityName;
 
     /** @var string */
-    private $entityShortName;
+    protected $entityShortName;
 
     /** @var array */
-    private $selectColumns = [];
+    protected $selectColumns = [];
 
     /** @var array */
-    private $joins = [];
+    protected $joins = [];
 
     /**
      * AutomaticQueryBuilder constructor.
