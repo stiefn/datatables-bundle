@@ -15,6 +15,7 @@ class HtmlColumn extends TextColumn
         $resolver
             ->setDefault('renderedLength', 50)
             ->setDefault('className', 'html_data')
+            ->setDefault('editorFieldType', 'tinymce')
             ->setAllowedTypes('renderedLength', 'int')
         ;
 

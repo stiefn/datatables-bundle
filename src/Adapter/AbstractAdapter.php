@@ -59,6 +59,7 @@ abstract class AbstractAdapter implements AdapterInterface
                 $value = ($mapping && $this->accessor->isReadable($result, $mapping)) ? $this->accessor->getValue($result, $mapping) : null;
                 $row[$column->getName()] = $column->transform($value, $result);
             }
+
             if (null !== $transformer) {
                 $row = call_user_func($transformer, $row, $result);
             }

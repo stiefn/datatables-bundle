@@ -452,9 +452,6 @@ class DataTable
                     }
                     $map[$i]['options'] = $mapping;
                 }
-                if($column->containsHtml()) {
-                    $map[$i]['type'] = 'tinymce';
-                }
                 $lines = $column->getOption('lines');
                 if(!is_null($lines) && $lines > 1) {
                     $map[$i]['type'] = 'textarea';
@@ -462,14 +459,20 @@ class DataTable
                         'rows' => $lines
                     ];
                 }
+                if($column->getFieldOptions()) {
+                    $map[$i]['options'] = $column->getFieldOptions();
+                }
                 if($column->isHidden()) {
                     $map[$i]['type'] = 'hidden';
                 }
                 if($column->isDate()) {
                     $map[$i]['type'] = 'date';
                 }
-                if($column->getOption('type') !== null) {
-                    $map[$i]['type'] = $column->getOption('type');
+                if($column->getDefaultValue() !== null) {
+                    $map[$i]['def'] = $column->getDefaultValue();
+                }
+                if($column->getType() !== null) {
+                    $map[$i]['type'] = $column->getType();
                 }
                 ++$i;
             }

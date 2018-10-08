@@ -5,6 +5,7 @@ namespace Omines\DataTablesBundle;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -53,7 +54,7 @@ class Editor {
 	        $objectData = $data[0];
             $type = $dataTable->getEntityType();
             $object = new $type();
-            $mergeErrors = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
+            $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
             $validationErrors = $this->validate($object);
             $errors = array_merge($mergeErrors, $validationErrors);
             if(!empty($errors)) {
@@ -87,7 +88,7 @@ class Editor {
             $output = [];
             foreach($data as $id => $objectData) {
                 $object = $repository->findOneBy(['id' => $id]);
-                $mergeErrors = $this->mergeObject($object, $dataTable, $objectData, $derivedFields);
+                $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
                 $validationErrors = $this->validate($object);
                 $errors = array_merge($mergeErrors, $validationErrors);
                 if(!empty($errors)) {
@@ -177,7 +178,13 @@ class Editor {
         return [];
     }
 
-    private function mergeObject($object, DataTable $dataTable, array $objectData, array $derivedFields) {
+    private function mergeObject(
+        EntityManagerInterface $em,
+        $object,
+        DataTable $dataTable,
+        array $objectData,
+        array $derivedFields
+    ) {
         $reflect = new \ReflectionClass(get_class($object));
         $errors = [];
         foreach($dataTable->getColumns() as $column) {
@@ -202,7 +209,19 @@ class Editor {
                                 }
                         }
                     }
-                    $object->$method($objectData[$column->getName()]);
+                    // if the setter requires an entity object
+                    if(strpos($setterType->getName(), 'App') !== false) {
+                        try {
+                            $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
+                        } catch(ORMException $e) {
+                            $errors[] = [
+                                'name' => $column->getName(),
+                                'status' => $this->translator->trans('blub', [], $this->domain)
+                            ];
+                        }
+                    } else {
+                        $object->$method($objectData[$column->getName()]);
+                    }
                 }
             }
         }

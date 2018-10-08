@@ -126,7 +126,9 @@ abstract class AbstractColumn
                 'uploadHandler' => null,
                 'dataHandler' => null,
                 'hidden' => false,
-                'type' => null
+                'type' => null,
+                'defaultValue' => null,
+                'options' => null
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -149,6 +151,8 @@ abstract class AbstractColumn
             ->setAllowedTypes('dataHandler', ['null', 'callable'])
             ->setAllowedTypes('hidden', ['boolean'])
             ->setAllowedTypes('type', ['null', 'string'])
+            ->setAllowedTypes('defaultValue', ['null', 'int', 'string'])
+            ->setAllowedTypes('options', ['null', 'array'])
         ;
 
         return $this;
@@ -378,6 +382,18 @@ abstract class AbstractColumn
 
     public function getNormalizedMap(): ?array {
         return null;
+    }
+
+    public function getDefaultValue() {
+        return $this->options['defaultValue'];
+    }
+
+    public function getType() {
+        return $this->options['type'];
+    }
+
+    public function getFieldOptions() {
+        return $this->options['options'];
     }
 
 }

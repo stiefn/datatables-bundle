@@ -27,9 +27,11 @@ class MapColumn extends TextColumn
     {
         parent::initialize($name, $index, $options, $dataTable);
 
+        /*
         if(!isset($options['map'])) {
             $this->options['map'] = $this->getMap();
         }
+        */
     }
 
     /**
@@ -50,7 +52,7 @@ class MapColumn extends TextColumn
         $resolver
             ->setDefaults([
                 'default' => null,
-                'map' => null,
+                'map' => [],
                 'normalizedMap' => null
             ])
             ->setAllowedTypes('default', ['null', 'string'])
