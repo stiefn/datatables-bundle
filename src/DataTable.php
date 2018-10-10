@@ -390,6 +390,10 @@ class DataTable
 
     }
 
+    public function getEditor(): ?Editor {
+        return $this->editor;
+    }
+
     protected function getInitialResponse(): array
     {
         $map = [];

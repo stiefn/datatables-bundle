@@ -14,6 +14,9 @@ class Editor {
     private $validator;
     private $translator;
     private $domain;
+    private $beforeCreate = null;
+    private $beforeEdit = null;
+    private $beforeRemove = null;
 
 	public function __construct(
         ManagerRegistry $mr,
@@ -43,6 +46,18 @@ class Editor {
         }
     }
 
+    public function setBeforeCreate(?callable $function) {
+	    $this->beforeCreate = $function;
+    }
+
+    public function setBeforeEdit(?callable $function) {
+        $this->beforeEdit = $function;
+    }
+
+    public function setBeforeRemove(?callable $function) {
+        $this->beforeRemove = $function;
+    }
+
     private function create(
         EntityManagerInterface $em,
         DataTable $dataTable,
@@ -60,6 +75,12 @@ class Editor {
             if(!empty($errors)) {
                 return [
                     'fieldErrors' => $errors
+                ];
+            }
+            if($this->beforeCreate !== null && !call_user_func($this->beforeCreate, $this->managerRegistry, $object)) {
+                // TODO: update error
+                return [
+                    'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
                 ];
             }
             $em->persist($object);
@@ -97,6 +118,12 @@ class Editor {
                     ];
                 }
                 $output[$id] = $this->objectToArray($dataTable, $object);
+                if($this->beforeEdit !== null && !call_user_func($this->beforeEdit, $this->managerRegistry, $object)) {
+                    // TODO: update error
+                    return [
+                        'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                    ];
+                }
             }
             $em->flush();
             return [
@@ -122,6 +149,12 @@ class Editor {
             }
             $q = $em->createQuery('DELETE FROM ' . $dataTable->getEntityType() . ' o WHERE o.id IN (' .
                 implode(', ', $ids) . ')');
+            if($this->beforeRemove !== null && !call_user_func($this->beforeRemove, $this->managerRegistry, $ids)) {
+                // TODO: update error
+                return [
+                    'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                ];
+            }
             $numDeleted = $q->execute();
             return [];
         }
@@ -210,7 +243,7 @@ class Editor {
                         }
                     }
                     // if the setter requires an entity object
-                    if(strpos($setterType->getName(), 'App') !== false) {
+                    if($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
                         try {
                             $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
                         } catch(ORMException $e) {
