@@ -102,6 +102,7 @@
                 root.html(data.template);
                 var dt = $('table', root).DataTable(dtOpts);
                 var editor = null;
+                var childEditors = null;
                 if(data.editorOptions) {
                     for(var i = 0; i < data.editorOptions.fields.length; ++i) {
                         if(data.editorOptions.fields[i].type && data.editorOptions.fields[i].type === 'upload') {
@@ -114,6 +115,15 @@
                     editorOpts['table'] = '#' + config.name;
                     editorOpts['ajax'] = config.url;
                     editor = new $.fn.dataTable.Editor(editorOpts);
+                }
+                if(data.childEditorOptions) {
+                    childEditors = [];
+                    $.each(data.childEditorOptions, function(name, options) {
+                        var editorOpts = $.extend({}, data.editorOptions, options);
+                        editorOpts['table'] = '#' + config.name;
+                        editorOpts['ajax'] = config.url;
+                        childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
+                    });
                 }
                 if (config.state !== 'none') {
                     dt.on('draw.dt', function(e) {
@@ -142,6 +152,7 @@
                     fulfill({
                         'dt': dt,
                         'editor': editor,
+                        'childEditors': childEditors,
                         'editorButtons': data.editorButtons
                     })
                 }

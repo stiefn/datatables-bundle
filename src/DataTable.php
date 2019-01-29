@@ -123,6 +123,8 @@ class DataTable
     /** @var string[] */
     private $editorButtons = [];
 
+    private $children = [];
+
     /**
      * DataTable constructor.
      *
@@ -158,6 +160,10 @@ class DataTable
         $this->columnsByName[$name] = $column;
 
         return $this;
+    }
+
+    public function addChild(DataTable $child, string $name) {
+        $this->children[$name] = $child;
     }
 
     public function setEditorButtons(array $editorButtons) {
@@ -374,6 +380,12 @@ class DataTable
             if($this->getUseEditor()) {
                 $response['editorOptions'] = $this->getInitialEditorResponse();
                 $response['editorButtons'] = $this->editorButtons;
+                if(count($this->children) > 0) {
+                    $response['childEditorOptions'] = [];
+                    foreach($this->children as $name => $child) {
+                        $response['childEditorOptions'][$name] = $child->getInitialEditorResponse();
+                    }
+                }
             }
             $response['template'] = $this->renderer->renderDataTable($this, $this->template, $this->templateParams);
         }
@@ -423,7 +435,7 @@ class DataTable
         ]);
     }
 
-    protected function getInitialEditorResponse(): array
+    public function getInitialEditorResponse(): array
     {
         $map = [];
         $i = 0;
