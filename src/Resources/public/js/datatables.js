@@ -121,7 +121,7 @@
                     $.each(data.childEditorOptions, function(name, options) {
                         var editorOpts = $.extend({}, data.editorOptions, options);
                         editorOpts['table'] = '#' + config.name;
-                        editorOpts['ajax'] = config.url;
+                        editorOpts['ajax'] = data.childEditorUrls[name];
                         childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
                     });
                 }

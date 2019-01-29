@@ -123,7 +123,11 @@ class DataTable
     /** @var string[] */
     private $editorButtons = [];
 
+    /** @var DataTable[]  */
     private $children = [];
+
+    /** @var string[]  */
+    private $childrenUrls = [];
 
     /**
      * DataTable constructor.
@@ -162,8 +166,9 @@ class DataTable
         return $this;
     }
 
-    public function addChild(DataTable $child, string $name) {
+    public function addChild(DataTable $child, string $name, string $editUrl) {
         $this->children[$name] = $child;
+        $this->childrenUrls[$name] = $editUrl;
     }
 
     public function setEditorButtons(array $editorButtons) {
@@ -382,6 +387,7 @@ class DataTable
                 $response['editorButtons'] = $this->editorButtons;
                 if(count($this->children) > 0) {
                     $response['childEditorOptions'] = [];
+                    $response['childEditorUrls'] = $this->childrenUrls;
                     foreach($this->children as $name => $child) {
                         $response['childEditorOptions'][$name] = $child->getInitialEditorResponse();
                     }
@@ -393,12 +399,16 @@ class DataTable
         return JsonResponse::create($response);
     }
 
-    public function getEditorResponse(array $derivedFields = []): JsonResponse {
+    public function getEditorResponse(array $derivedFields = [], string $childName = null): JsonResponse {
         if (null === $this->editorState) {
             throw new InvalidStateException('No Editor state available, did you call handleRequest?');
         }
 
-        return JsonResponse::create($this->editor->process($this, $this->editorState, $derivedFields));
+        $dt = $this;
+        if($childName !== null) {
+            $dt = $this->children[$childName];
+        }
+        return JsonResponse::create($this->editor->process($dt, $this->editorState, $derivedFields));
 
     }
 
