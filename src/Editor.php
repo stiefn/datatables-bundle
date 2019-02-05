@@ -228,7 +228,6 @@ class Editor {
                     if($handler !== null) {
                         $objectData[$column->getName()] = $handler($objectData, $objectData[$column->getName()]);
                     }
-                    $type = gettype($objectData[$column->getName()]);
                     $setterType = $reflect->getMethod($method)->getParameters()[0]->getType();
                     if($setterType !== null && $setterType->getName() !== 'string') {
                         switch($setterType->getName()) {
@@ -256,6 +255,12 @@ class Editor {
                         }
                     } else {
                         $object->$method($objectData[$column->getName()]);
+                    }
+                    if($column->isRequired() && strlen($objectData[$column->getName()]) === 0) {
+                        $errors[] = [
+                            'name' => $column->getName(),
+                            'status' => $this->translator->trans('datatable.editor.error.fieldRequired', [], $this->domain)
+                        ];
                     }
                 }
             }

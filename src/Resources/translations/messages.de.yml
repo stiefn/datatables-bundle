@@ -31,6 +31,7 @@ datatable:
             emptyData: "Inkorrektes Datenformat gesendet"
             emptyUpload: "Fehlerhafter Datei-Upload"
             integerRequired: "Dieser Wert muss eine Zahl sein"
+            fieldRequired: "Dieses Feld ist Pflicht"
         fileUpload:
             uploadText: "Datei wählen..."
             dragDropText: "Datei hier per Drag&Drop ablegen"

@@ -128,7 +128,8 @@ abstract class AbstractColumn
                 'hidden' => false,
                 'type' => null,
                 'defaultValue' => null,
-                'options' => null
+                'options' => null,
+                'required' => false
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -153,6 +154,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('type', ['null', 'string'])
             ->setAllowedTypes('defaultValue', ['null', 'int', 'string'])
             ->setAllowedTypes('options', ['null', 'array'])
+            ->setAllowedTypes('required', ['null', 'boolean'])
         ;
 
         return $this;
@@ -394,6 +396,10 @@ abstract class AbstractColumn
 
     public function getFieldOptions() {
         return $this->options['options'];
+    }
+
+    public function isRequired() {
+        return $this->options['required'];
     }
 
 }

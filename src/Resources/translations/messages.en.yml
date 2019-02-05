@@ -31,6 +31,7 @@ datatable:
             emptyData: "Incorrect data format"
             emptyUpload: "Incorrect file upload"
             integerRequired: "This value must be an integer"
+            fieldRequired: "This field is required"
         fileUpload:
             uploadText: "Choose file..."
             dragDropText: "Drag and drop a file here to upload"
