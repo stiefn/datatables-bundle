@@ -375,7 +375,7 @@ class DataTable
 
         $resultSet = $this->getResultSet();
         $response = [
-            'draw' => $this->state->getDraw(),
+            'draw' => 0,
             'recordsTotal' => $resultSet->getTotalRecords(),
             'recordsFiltered' => $resultSet->getTotalDisplayRecords(),
             'data' => iterator_to_array($resultSet->getData())
@@ -397,6 +397,29 @@ class DataTable
         }
 
         return JsonResponse::create($response);
+    }
+
+    public function getConfig() {
+        $response = [
+            'draw' => 0,
+            'recordsTotal' => 0,
+            'recordsFiltered' => 0,
+            'data' => []
+        ];
+        $response['options'] = $this->getInitialResponse();
+        if($this->getUseEditor()) {
+            $response['editorOptions'] = $this->getInitialEditorResponse();
+            $response['editorButtons'] = $this->editorButtons;
+            if(count($this->children) > 0) {
+                $response['childEditorOptions'] = [];
+                $response['childEditorUrls'] = $this->childrenUrls;
+                foreach($this->children as $name => $child) {
+                    $response['childEditorOptions'][$name] = $child->getInitialEditorResponse();
+                }
+            }
+        }
+        $response['template'] = $this->renderer->renderDataTable($this, $this->template, $this->templateParams);
+        return $response;
     }
 
     public function getEditorResponse(array $derivedFields = [], string $childName = null): JsonResponse {
