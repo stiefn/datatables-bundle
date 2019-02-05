@@ -226,7 +226,7 @@ class Editor {
                 if(method_exists($object, $method)) {
                     $handler = $column->getDataHandler();
                     if($handler !== null) {
-                        $objectData[$column->getName()] = $handler($objectData[$column->getName()]);
+                        $objectData[$column->getName()] = $handler($objectData, $objectData[$column->getName()]);
                     }
                     $type = gettype($objectData[$column->getName()]);
                     $setterType = $reflect->getMethod($method)->getParameters()[0]->getType();
@@ -245,7 +245,9 @@ class Editor {
                     // if the setter requires an entity object
                     if($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
                         try {
-                            $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
+                            if($objectData[$column->getName()] !== null) {
+                                $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
+                            }
                         } catch(ORMException $e) {
                             $errors[] = [
                                 'name' => $column->getName(),
