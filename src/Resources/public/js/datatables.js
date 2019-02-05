@@ -36,132 +36,120 @@
         };
 
         return new Promise((fulfill, reject) => {
-            // Perform initial load
-            $.ajax(config.url, {
-                method: config.method,
-                data: {
-                    _dt: config.name,
-                    _init: true
-                }
-            }).done(function(data) {
-                var baseState;
+            var baseState;
 
-                function createMapRenderFunction(map) {
-                    return function ( value, type, row, meta ) {
-                        if(map[value]) {
-                            return map[value];
+            function createMapRenderFunction(map) {
+                return function ( value, type, row, meta ) {
+                    if(map[value]) {
+                        return map[value];
+                    }
+                    return '';
+                }
+            }
+            function createSubstrRenderFunction(length) {
+                return function ( value, type, row, meta ) {
+                    if(value.length > length) {
+                        return value.substring(0, length) + '...';
+                    }
+                    return value;
+                }
+            }
+            for(var i = 0; i < initialConfig.options.columns.length; ++i) {
+                if(initialConfig.options.columns[i].map) {
+                    var map = initialConfig.options.columns[i].map;
+                    initialConfig.options.columns[i].render = createMapRenderFunction(map);
+                } else if(initialConfig.options.columns[i].renderedLength) {
+                    var length = initialConfig.options.columns[i].renderedLength;
+                    initialConfig.options.columns[i].render = createSubstrRenderFunction(length);
+                }
+            }
+            // Merge all options from different sources together and add the Ajax loader
+            var dtOpts = $.extend({}, initialConfig.options, config.options, options, persistOptions, {
+                ajax: function (request, drawCallback, settings) {
+                    if (initialConfig) {
+                        initialConfig.draw = request.draw;
+                        drawCallback(initialConfig);
+                        initialConfig = null;
+                        var merged = $.extend(true, {}, dt.state(), state);
+                        if (Object.keys(merged).length) {
+                            dt
+                                .order(merged.order)
+                                .search(merged.search.search)
+                                .page.len(merged.length)
+                                .page(merged.start / merged.length)
+                                .draw(false);
                         }
-                        return '';
-                    }
-                }
-                function createSubstrRenderFunction(length) {
-                    return function ( value, type, row, meta ) {
-                        if(value.length > length) {
-                            return value.substring(0, length) + '...';
-                        }
-                        return value;
-                    }
-                }
-                for(var i = 0; i < data.options.columns.length; ++i) {
-                    if(data.options.columns[i].map) {
-                        var map = data.options.columns[i].map;
-                        data.options.columns[i].render = createMapRenderFunction(map);
-                    } else if(data.options.columns[i].renderedLength) {
-                        var length = data.options.columns[i].renderedLength;
-                        data.options.columns[i].render = createSubstrRenderFunction(length);
-                    }
-                }
-                // Merge all options from different sources together and add the Ajax loader
-                var dtOpts = $.extend({}, data.options, config.options, options, persistOptions, {
-                    ajax: function (request, drawCallback, settings) {
-                        if (data) {
-                            data.draw = request.draw;
+                    } else {
+                        request._dt = config.name;
+                        $.ajax(config.url, {
+                            method: config.method,
+                            data: request
+                        }).done(function(data) {
                             drawCallback(data);
-                            data = null;
-                            var merged = $.extend(true, {}, dt.state(), state);
-                            if (Object.keys(merged).length) {
-                                dt
-                                    .order(merged.order)
-                                    .search(merged.search.search)
-                                    .page.len(merged.length)
-                                    .page(merged.start / merged.length)
-                                    .draw(false);
-                            }
-                        } else {
-                            request._dt = config.name;
-                            $.ajax(config.url, {
-                                method: config.method,
-                                data: request
-                            }).done(function(data) {
-                                drawCallback(data);
-                            })
-                        }
+                        })
                     }
-                });
+                }
+            });
 
-                root.html(data.template);
-                var dt = $('table', root).DataTable(dtOpts);
-                var editor = null;
-                var childEditors = null;
-                if(data.editorOptions) {
-                    for(var i = 0; i < data.editorOptions.fields.length; ++i) {
-                        if(data.editorOptions.fields[i].type && data.editorOptions.fields[i].type === 'upload') {
-                            data.editorOptions.fields[i].display = function(id) {
-                                return fileHandler(editor, id);
-                            }
+            root.html(initialConfig.template);
+            var dt = $('table', root).DataTable(dtOpts);
+            var editor = null;
+            var childEditors = null;
+            if(initialConfig.editorOptions) {
+                for(var i = 0; i < initialConfig.editorOptions.fields.length; ++i) {
+                    if(initialConfig.editorOptions.fields[i].type && initialConfig.editorOptions.fields[i].type === 'upload') {
+                        initialConfig.editorOptions.fields[i].display = function(id) {
+                            return fileHandler(editor, id);
                         }
                     }
-                    var editorOpts = $.extend({}, data.editorOptions, editorOptions);
+                }
+                var editorOpts = $.extend({}, initialConfig.editorOptions, editorOptions);
+                editorOpts['table'] = '#' + config.name;
+                editorOpts['ajax'] = config.url;
+                editor = new $.fn.dataTable.Editor(editorOpts);
+            }
+            if(initialConfig.childEditorOptions) {
+                childEditors = [];
+                $.each(initialConfig.childEditorOptions, function(name, options) {
+                    var editorOpts = $.extend({}, initialConfig.editorOptions, options);
                     editorOpts['table'] = '#' + config.name;
-                    editorOpts['ajax'] = config.url;
-                    editor = new $.fn.dataTable.Editor(editorOpts);
-                }
-                if(data.childEditorOptions) {
-                    childEditors = [];
-                    $.each(data.childEditorOptions, function(name, options) {
-                        var editorOpts = $.extend({}, data.editorOptions, options);
-                        editorOpts['table'] = '#' + config.name;
-                        editorOpts['ajax'] = data.childEditorUrls[name];
-                        childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
-                    });
-                }
-                if (config.state !== 'none') {
-                    dt.on('draw.dt', function(e) {
-                        var data = $.param(dt.state()).split('&');
-
-                        // First draw establishes state, subsequent draws run diff on the first
-                        if (!baseState) {
-                            baseState = data;
-                        } else {
-                            var diff = data.filter(el => { return baseState.indexOf(el) === -1 && el.indexOf('time=') !== 0; });
-                            switch (config.state) {
-                                case 'fragment':
-                                    history.replaceState(null, null, window.location.origin + window.location.pathname + window.location.search
-                                        + '#' + decodeURIComponent(diff.join('&')));
-                                    break;
-                                case 'query':
-                                    history.replaceState(null, null, window.location.origin + window.location.pathname
-                                        + '?' + decodeURIComponent(diff.join('&') + window.location.hash));
-                                    break;
-                            }
-                        }
-                    })
-                }
-
-                if(data.editorOptions) {
-                    fulfill({
-                        'dt': dt,
-                        'editor': editor,
-                        'childEditors': childEditors,
-                        'editorButtons': data.editorButtons
-                    })
-                }
-                fulfill({
-                    'dt': dt
+                    editorOpts['ajax'] = initialConfig.childEditorUrls[name];
+                    childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
                 });
-            }).fail(function(xhr, cause, msg) {
-                console.error('DataTables request failed: ' + msg);
-                reject(cause);
+            }
+            if (config.state !== 'none') {
+                dt.on('draw.dt', function(e) {
+                    var initialConfig = $.param(dt.state()).split('&');
+
+                    // First draw establishes state, subsequent draws run diff on the first
+                    if (!baseState) {
+                        baseState = initialConfig;
+                    } else {
+                        var diff = initialConfig.filter(el => { return baseState.indexOf(el) === -1 && el.indexOf('time=') !== 0; });
+                        switch (config.state) {
+                            case 'fragment':
+                                history.replaceState(null, null, window.location.origin + window.location.pathname + window.location.search
+                                    + '#' + decodeURIComponent(diff.join('&')));
+                                break;
+                            case 'query':
+                                history.replaceState(null, null, window.location.origin + window.location.pathname
+                                    + '?' + decodeURIComponent(diff.join('&') + window.location.hash));
+                                break;
+                        }
+                    }
+                })
+            }
+
+            if(initialConfig.editorOptions) {
+                fulfill({
+                    'dt': dt,
+                    'editor': editor,
+                    'childEditors': childEditors,
+                    'editorButtons': initialConfig.editorButtons
+                })
+            }
+            fulfill({
+                'dt': dt
             });
         });
     };
