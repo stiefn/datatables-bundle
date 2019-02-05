@@ -111,7 +111,15 @@
             if(initialConfig.childEditorOptions) {
                 childEditors = [];
                 $.each(initialConfig.childEditorOptions, function(name, options) {
+                    for(var i = 0; i < options.fields.length; ++i) {
+                        if(options.fields[i].type && options.fields[i].type === 'upload') {
+                            options.fields[i].display = function(id) {
+                                return fileHandler(editor, id);
+                            }
+                        }
+                    }
                     var editorOpts = $.extend({}, initialConfig.editorOptions, options);
+                    console.log(editorOpts);
                     editorOpts['table'] = '#' + config.name;
                     editorOpts['ajax'] = initialConfig.childEditorUrls[name];
                     childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
