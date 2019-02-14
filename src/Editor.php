@@ -77,7 +77,7 @@ class Editor {
                     'fieldErrors' => $errors
                 ];
             }
-            if($this->beforeCreate !== null && !call_user_func($this->beforeCreate, $this->managerRegistry, $object)) {
+            if($this->beforeCreate !== null && !call_user_func($this->beforeCreate, $this->managerRegistry, $dataTable, $object, $objectData)) {
                 // TODO: update error
                 return [
                     'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
@@ -118,7 +118,8 @@ class Editor {
                     ];
                 }
                 $output[$id] = $this->objectToArray($dataTable, $object);
-                if($this->beforeEdit !== null && !call_user_func($this->beforeEdit, $this->managerRegistry, $object)) {
+                if($this->beforeEdit !== null
+                    && !call_user_func($this->beforeEdit, $this->managerRegistry, $dataTable, $object, $objectData)) {
                     // TODO: update error
                     return [
                         'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
@@ -240,6 +241,10 @@ class Editor {
                                     continue 2;
                                 }
                         }
+                    }
+                    // for multiple file uploads
+                    if($setterType->getName() === 'string' && is_array($objectData[$column->getName()])) {
+                        $objectData[$column->getName()] = json_encode($objectData[$column->getName()]);
                     }
                     // if the setter requires an entity object
                     if($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
