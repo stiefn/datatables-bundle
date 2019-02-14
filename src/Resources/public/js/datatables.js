@@ -97,7 +97,9 @@
             var childEditors = null;
             if(initialConfig.editorOptions) {
                 for(var i = 0; i < initialConfig.editorOptions.fields.length; ++i) {
-                    if(initialConfig.editorOptions.fields[i].type && initialConfig.editorOptions.fields[i].type === 'upload') {
+                    if(initialConfig.editorOptions.fields[i].type
+                        && (initialConfig.editorOptions.fields[i].type === 'upload'
+                            || initialConfig.editorOptions.fields[i].type === 'uploadMany')) {
                         initialConfig.editorOptions.fields[i].display = function(id) {
                             return fileHandler(editor, id);
                         }
@@ -112,14 +114,14 @@
                 childEditors = [];
                 $.each(initialConfig.childEditorOptions, function(name, options) {
                     for(var i = 0; i < options.fields.length; ++i) {
-                        if(options.fields[i].type && options.fields[i].type === 'upload') {
+                        if(options.fields[i].type && (options.fields[i].type === 'upload'
+                            || options.fields[i].type === 'uploadMany')) {
                             options.fields[i].display = function(id) {
                                 return fileHandler(editor, id);
                             }
                         }
                     }
                     var editorOpts = $.extend({}, initialConfig.editorOptions, options);
-                    console.log(editorOpts);
                     editorOpts['table'] = '#' + config.name;
                     editorOpts['ajax'] = initialConfig.childEditorUrls[name];
                     childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
@@ -348,6 +350,5 @@
             return tinymce.get( conf._safeId );
         }
     };
-
 
 }));
