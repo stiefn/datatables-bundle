@@ -431,7 +431,7 @@ class DataTable
         if($childName !== null) {
             $dt = $this->children[$childName];
         }
-        return JsonResponse::create($this->editor->process($dt, $this->editorState, $derivedFields));
+        return JsonResponse::create($dt->editor->process($dt, $this->editorState, $derivedFields));
 
     }
 

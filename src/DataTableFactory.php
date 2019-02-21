@@ -69,7 +69,7 @@ class DataTableFactory
             ->setTranslationDomain($config['translation_domain'] ?? 'messages')
             ->setLanguageFromCDN($config['language_from_cdn'] ?? true)
             ->setTemplate($config['template'] ?? DataTable::DEFAULT_TEMPLATE, $config['template_parameters'] ?? [])
-            ->setEditor($this->editor)
+            ->setEditor(clone $this->editor)
             ->setTranslator($this->translator)
         ;
     }

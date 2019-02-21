@@ -17,6 +17,9 @@ class Editor {
     private $beforeCreate = null;
     private $beforeEdit = null;
     private $beforeRemove = null;
+    private $afterCreate = null;
+    private $afterEdit = null;
+    private $afterRemove = null;
 
 	public function __construct(
         ManagerRegistry $mr,
@@ -58,6 +61,18 @@ class Editor {
         $this->beforeRemove = $function;
     }
 
+    public function setAfterCreate(?callable $function) {
+        $this->afterCreate = $function;
+    }
+
+    public function setAfterEdit(?callable $function) {
+        $this->afterEdit = $function;
+    }
+
+    public function setAfterRemove(?callable $function) {
+        $this->afterRemove = $function;
+    }
+
     private function create(
         EntityManagerInterface $em,
         DataTable $dataTable,
@@ -85,6 +100,12 @@ class Editor {
             }
             $em->persist($object);
             $em->flush();
+            if($this->afterCreate !== null && !call_user_func($this->afterCreate, $this->managerRegistry, $dataTable, $object, $objectData)) {
+                // TODO: update error
+                return [
+                    'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                ];
+            }
             $output = [
                 0 => $this->objectToArray($dataTable, $object)
             ];
@@ -107,6 +128,7 @@ class Editor {
         $repository = $em->getRepository($dataTable->getEntityType());
         if(is_array($data) && count($data) > 0) {
             $output = [];
+            $objects = [];
             foreach($data as $id => $objectData) {
                 $object = $repository->findOneBy(['id' => $id]);
                 $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
@@ -118,6 +140,10 @@ class Editor {
                     ];
                 }
                 $output[$id] = $this->objectToArray($dataTable, $object);
+                $objects[] = [
+                    'object' => $object,
+                    'objectData' => $objectData
+                ];
                 if($this->beforeEdit !== null
                     && !call_user_func($this->beforeEdit, $this->managerRegistry, $dataTable, $object, $objectData)) {
                     // TODO: update error
@@ -127,6 +153,15 @@ class Editor {
                 }
             }
             $em->flush();
+            foreach($objects as $object) {
+                if($this->afterEdit !== null
+                    && !call_user_func($this->afterEdit, $this->managerRegistry, $dataTable, $object['object'], $object['objectData'])) {
+                    // TODO: update error
+                    return [
+                        'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                    ];
+                }
+            }
             return [
                 'data' => $output
             ];
@@ -156,7 +191,13 @@ class Editor {
                     'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
                 ];
             }
-            $numDeleted = $q->execute();
+            $q->execute();
+            if($this->afterRemove !== null && !call_user_func($this->afterRemove, $this->managerRegistry, $ids)) {
+                // TODO: update error
+                return [
+                    'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                ];
+            }
             return [];
         }
         return [
