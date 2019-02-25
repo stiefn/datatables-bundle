@@ -294,7 +294,7 @@ class Editor {
                         }
                     }
                     // for multiple file uploads
-                    if($setterType->getName() === 'string' && is_array($objectData[$column->getName()])) {
+                    if($setterType !== null && $setterType->getName() === 'string' && is_array($objectData[$column->getName()])) {
                         $objectData[$column->getName()] = json_encode($objectData[$column->getName()]);
                     }
                     // if the setter requires an entity object
@@ -319,6 +319,12 @@ class Editor {
                         'status' => $this->translator->trans('datatable.editor.error.fieldRequired', [], $this->domain)
                     ];
                 }
+            }
+            if($column->isRequired() && !isset($objectData[$column->getName()])) {
+                $errors[] = [
+                    'name' => $column->getName(),
+                    'status' => $this->translator->trans('datatable.editor.error.fieldRequired', [], $this->domain)
+                ];
             }
         }
         foreach($derivedFields as $field => $value) {
