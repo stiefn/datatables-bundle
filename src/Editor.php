@@ -278,6 +278,7 @@ class Editor {
                 if(method_exists($object, $method)) {
                     $handler = $column->getDataHandler();
                     if($handler !== null) {
+                        //echo $column->getName() . ' ' . $handler($objectData, $objectData[$column->getName()]);
                         $objectData[$column->getName()] = $handler($objectData, $objectData[$column->getName()]);
                     }
                     $setterType = $reflect->getMethod($method)->getParameters()[0]->getType();

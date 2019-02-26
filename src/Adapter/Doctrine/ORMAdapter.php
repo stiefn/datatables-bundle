@@ -124,6 +124,7 @@ class ORMAdapter extends AbstractAdapter
 
         // Get record count after filtering
         $this->buildCriteria($builder, $state);
+
         $query->setFilteredRows($this->getCount($builder, $identifier));
 
         // Perform mapping of all referred fields and implied fields
