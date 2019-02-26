@@ -129,6 +129,8 @@ class DataTable
     /** @var string[]  */
     private $childrenUrls = [];
 
+    private $allowInlineEditing = true;
+
     /**
      * DataTable constructor.
      *
@@ -452,7 +454,7 @@ class DataTable
                     'visible' => $column->isVisible(),
                     'className' => $column->getClassName()
                 ];
-                if($column->isEditable()) {
+                if($column->isEditable() && $this->allowInlineEditing) {
                     $map[$i]['className'] .= ' editable';
                 }
                 if($column->getMap() !== null) {
@@ -727,5 +729,9 @@ class DataTable
         $resolver->setDefaults(self::DEFAULT_OPTIONS);
 
         return $this;
+    }
+
+    public function allowInlineEditing(bool $allow) {
+        $this->allowInlineEditing = $allow;
     }
 }
