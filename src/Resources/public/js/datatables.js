@@ -37,6 +37,16 @@
 
         return new Promise((fulfill, reject) => {
             var baseState;
+            var childEditorInstances = [];
+
+            function createChildEditor(name, editorOpts) {
+                return (function() {
+                    if(childEditorInstances[name] === undefined) {
+                        childEditorInstances[name] = new $.fn.dataTable.Editor(editorOpts);
+                    }
+                    return childEditorInstances[name];
+                });
+            }
 
             function createMapRenderFunction(map) {
                 return function ( value, type, row, meta ) {
@@ -124,7 +134,7 @@
                     var editorOpts = $.extend({}, initialConfig.editorOptions, options);
                     editorOpts['table'] = '#' + config.name;
                     editorOpts['ajax'] = initialConfig.childEditorUrls[name];
-                    childEditors[name] = new $.fn.dataTable.Editor(editorOpts);
+                    childEditors[name] = createChildEditor(name, editorOpts);
                 });
             }
             if (config.state !== 'none') {
