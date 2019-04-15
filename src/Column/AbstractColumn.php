@@ -126,6 +126,7 @@ abstract class AbstractColumn
                 'uploadHandler' => null,
                 'dataHandler' => null,
                 'hidden' => false,
+                'hiddenInput' => false,
                 'type' => null,
                 'defaultValue' => null,
                 'options' => null,
@@ -151,6 +152,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('fileMany', ['null', 'boolean'])
             ->setAllowedTypes('dataHandler', ['null', 'callable'])
             ->setAllowedTypes('hidden', ['boolean'])
+            ->setAllowedTypes('hiddenInput', ['boolean'])
             ->setAllowedTypes('type', ['null', 'string'])
             ->setAllowedTypes('defaultValue', ['null', 'int', 'string'])
             ->setAllowedTypes('options', ['null', 'array'])
@@ -328,6 +330,10 @@ abstract class AbstractColumn
 
     public function isHidden(): bool {
         return $this->options['hidden'];
+    }
+
+    public function isHiddenInput(): bool {
+        return $this->options['hiddenInput'];
     }
 
     /**

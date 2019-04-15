@@ -239,13 +239,18 @@ class ORMAdapter extends AbstractAdapter
 
         $qb->resetDQLPart('orderBy');
         $gb = $qb->getDQLPart('groupBy');
-        if (empty($gb) || !in_array($identifier, $gb, true)) {
+        if (empty($gb)) {
             $qb->select($qb->expr()->count($identifier));
 
             return (int) $qb->getQuery()->getSingleScalarResult();
         } else {
+            $identifiers = [];
+            /** @var Query\Expr\GroupBy $group */
+            foreach($gb as $group) {
+                $identifiers = array_merge($identifiers, $group->getParts());
+            }
             $qb->resetDQLPart('groupBy');
-            $qb->select($qb->expr()->countDistinct($identifier));
+            $qb->select($qb->expr()->countDistinct(implode(',', $identifiers)));
 
             return (int) $qb->getQuery()->getSingleScalarResult();
         }

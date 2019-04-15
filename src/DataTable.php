@@ -513,9 +513,6 @@ class DataTable
                 if($column->getFieldOptions()) {
                     $map[$i]['options'] = $column->getFieldOptions();
                 }
-                if($column->isHidden()) {
-                    $map[$i]['type'] = 'hidden';
-                }
                 if($column->isDate()) {
                     $map[$i]['type'] = 'date';
                 }
@@ -524,6 +521,9 @@ class DataTable
                 }
                 if($column->getType() !== null) {
                     $map[$i]['type'] = $column->getType();
+                }
+                if($column->isHidden() || $column->isHiddenInput()) {
+                    $map[$i]['type'] = 'hidden';
                 }
                 ++$i;
             }

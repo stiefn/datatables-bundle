@@ -294,10 +294,6 @@ class Editor {
                                 }
                         }
                     }
-                    // for multiple file uploads
-                    if($setterType !== null && $setterType->getName() === 'string' && is_array($objectData[$column->getName()])) {
-                        $objectData[$column->getName()] = json_encode($objectData[$column->getName()]);
-                    }
                     // if the setter requires an entity object
                     if($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
                         try {
@@ -314,7 +310,9 @@ class Editor {
                         $object->$method($objectData[$column->getName()]);
                     }
                 }
-                if($column->isRequired() && strlen($objectData[$column->getName()]) === 0) {
+                if($column->isRequired()) {
+                    if(($column->isFileMany() && count($objectData[$column->getName()]) === 0)
+                        || (!$column->isFileMany() && strlen($objectData[$column->getName()]) === 0))
                     $errors[] = [
                         'name' => $column->getName(),
                         'status' => $this->translator->trans('datatable.editor.error.fieldRequired', [], $this->domain)
