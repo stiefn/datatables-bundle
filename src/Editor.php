@@ -285,12 +285,16 @@ class Editor {
                     if($setterType !== null && $setterType->getName() !== 'string') {
                         switch($setterType->getName()) {
                             case 'int':
-                                if((string)intval($objectData[$column->getName()]) !== (string)$objectData[$column->getName()]) {
-                                    $errors[] = [
-                                        'name' => $column->getName(),
-                                        'status' => $this->translator->trans('datatable.editor.error.integerRequired', [], $this->domain)
-                                    ];
-                                    continue 2;
+                                if(!$setterType->allowsNull() || $objectData[$column->getName()] !== '') {
+                                    if ((string)intval($objectData[$column->getName()]) !== (string)$objectData[$column->getName()]) {
+                                        $errors[] = [
+                                            'name' => $column->getName(),
+                                            'status' => $this->translator->trans('datatable.editor.error.integerRequired', [], $this->domain)
+                                        ];
+                                        continue 2;
+                                    }
+                                } else if($setterType->allowsNull()) {
+                                    $objectData[$column->getName()] = null;
                                 }
                         }
                     }
