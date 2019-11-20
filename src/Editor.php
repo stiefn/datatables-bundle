@@ -301,8 +301,13 @@ class Editor {
                     // if the setter requires an entity object
                     if($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
                         try {
-                            if($objectData[$column->getName()] !== null) {
+                            if($objectData[$column->getName()] !== null && $objectData[$column->getName()] !== '') {
                                 $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
+                            } else {
+                                $errors[] = [
+                                    'name' => $column->getName(),
+                                    'status' => $this->translator->trans('datatable.editor.error.entityRequired', [], $this->domain)
+                                ];
                             }
                         } catch(ORMException $e) {
                             $errors[] = [
