@@ -296,7 +296,8 @@
                     tinymce.init( $.extend( true, {
                         selector: '#'+conf._safeId,
                         height: '250',
-                        language: 'de'
+                        language: 'de',
+                        plugins: ['link']
                     }, conf.opts, {
                         init_instance_callback: createInitFunction(conf._initSetVal)
                     } ) );
