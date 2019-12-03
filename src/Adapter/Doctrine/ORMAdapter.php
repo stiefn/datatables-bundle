@@ -79,7 +79,9 @@ class ORMAdapter extends AbstractAdapter
         $options = $resolver->resolve($options);
 
         // Enable automated mode or just get the general default entity manager
-        if (null === ($this->manager = $this->registry->getManagerForClass($options['entity']))) {
+        if(isset($options['alternativeEm']) && $options['alternativeEm'] !== null) {
+            $this->manager = $this->registry->getManager($options['alternativeEm']);
+        } else if (null === ($this->manager = $this->registry->getManagerForClass($options['entity']))) {
             throw new InvalidConfigurationException(sprintf('Doctrine has no manager for entity "%s", is it correctly imported and referenced?', $options['entity']));
         }
         $this->metadata = $this->manager->getClassMetadata($options['entity']);
@@ -298,6 +300,7 @@ class ORMAdapter extends AbstractAdapter
         $resolver
             ->setDefaults([
                 'hydrate' => Query::HYDRATE_OBJECT,
+                'alternativeEm' => null,
                 'query' => [],
                 'criteria' => function (Options $options) {
                     return [new SearchCriteriaProvider()];
@@ -306,6 +309,7 @@ class ORMAdapter extends AbstractAdapter
             ->setRequired('entity')
             ->setAllowedTypes('entity', ['string'])
             ->setAllowedTypes('hydrate', 'int')
+            ->setAllowedTypes('alternativeEm', ['null', 'string'])
             ->setAllowedTypes('query', [QueryBuilderProcessorInterface::class, 'array', 'callable'])
             ->setAllowedTypes('criteria', [QueryBuilderProcessorInterface::class, 'array', 'callable', 'null'])
             ->setNormalizer('query', $providerNormalizer)
