@@ -86,7 +86,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         }
     }
 
-    private function addSelectColumns(AbstractColumn $column, string $field)
+    protected function addSelectColumns(AbstractColumn $column, string $field)
     {
         $currentPart = $this->entityShortName;
         $currentAlias = $currentPart;
@@ -112,7 +112,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         $this->addSelectColumn($currentAlias, $parts[0]);
     }
 
-    private function addSelectColumn($columnTableName, $data)
+    protected function addSelectColumn($columnTableName, $data)
     {
         if (isset($this->selectColumns[$columnTableName])) {
             if (!in_array($data, $this->selectColumns[$columnTableName], true)) {
@@ -125,14 +125,14 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         return $this;
     }
 
-    private function getIdentifier(ClassMetadata $metadata)
+    protected function getIdentifier(ClassMetadata $metadata)
     {
         $identifiers = $metadata->getIdentifierFieldNames();
 
         return array_shift($identifiers);
     }
 
-    private function setIdentifierFromAssociation(string $association, string $key, ClassMetadata $metadata)
+    protected function setIdentifierFromAssociation(string $association, string $key, ClassMetadata $metadata)
     {
         $targetEntityClass = $metadata->getAssociationTargetClass($key);
 
@@ -143,7 +143,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         return $targetMetadata;
     }
 
-    private function setSelectFrom(QueryBuilder $qb)
+    protected function setSelectFrom(QueryBuilder $qb)
     {
         foreach ($this->selectColumns as $key => $value) {
             if (false === empty($key)) {
@@ -156,7 +156,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         return $this;
     }
 
-    private function setJoins(QueryBuilder $qb)
+    protected function setJoins(QueryBuilder $qb)
     {
         foreach ($this->joins as $key => $value) {
             $qb->{$value['type']}($key, $value['alias']);

@@ -161,16 +161,34 @@
             }
 
             if(initialConfig.editorOptions) {
-                fulfill({
+                let output = {
                     'dt': dt,
                     'editor': editor,
                     'childEditors': childEditors,
-                    'editorButtons': initialConfig.editorButtons
-                })
+                    'editorButtons': initialConfig.editorButtons,
+                    'groupingEnabled': initialConfig.groupingEnabled
+                }
+                if(initialConfig.groupingEnabled) {
+                    output = $.extend(output, {
+                        'groupingColumn': initialConfig.groupingColumn,
+                        'groupCreationField': initialConfig.groupCreationField,
+                        'groupCreationIds': initialConfig.groupCreationIds,
+                        'childRowColumns': initialConfig.childRowColumns,
+                    });
+                }
+                fulfill(output)
             }
-            fulfill({
-                'dt': dt
-            });
+            let output = {
+                'dt': dt,
+                'groupingEnabled': initialConfig.groupingEnabled
+            }
+            if(initialConfig.groupingEnabled) {
+                output = $.extend(output, {
+                    'groupingColumn': initialConfig.groupingColumn,
+                    'childRowColumns': initialConfig.childRowColumns,
+                });
+            }
+            fulfill(output);
         });
     };
 

@@ -81,38 +81,38 @@ class Editor {
     ): array {
 	    $data = $state->getData();
 	    if(is_array($data) && count($data) > 0) {
-	        $objectData = $data[0];
-            $type = $dataTable->getEntityType();
-            $object = new $type();
-            $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
-            $validationErrors = $this->validate($object);
-            $errors = array_merge($mergeErrors, $validationErrors);
-            if(!empty($errors)) {
-                return [
-                    'fieldErrors' => $errors
-                ];
-            }
-            foreach($this->beforeCreate as $beforeCreate) {
-                if(!call_user_func($beforeCreate, $this->managerRegistry, $dataTable, $object, $objectData)) {
-                    // TODO: update error
+	        $output = [];
+	        foreach($data as $key => $objectData) {
+                $type = $dataTable->getEntityType();
+                $object = new $type();
+                $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
+                $validationErrors = $this->validate($object);
+                $errors = array_merge($mergeErrors, $validationErrors);
+                if (!empty($errors)) {
                     return [
-                        'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                        'fieldErrors' => $errors
                     ];
                 }
-            }
-            $em->persist($object);
-            $em->flush();
-            foreach($this->afterCreate as $afterCreate) {
-                if(!call_user_func($afterCreate, $this->managerRegistry, $dataTable, $object, $objectData)) {
-                    // TODO: update error
-                    return [
-                        'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
-                    ];
+                foreach ($this->beforeCreate as $beforeCreate) {
+                    if (!call_user_func($beforeCreate, $this->managerRegistry, $dataTable, $object, $objectData)) {
+                        // TODO: update error
+                        return [
+                            'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                        ];
+                    }
                 }
+                $em->persist($object);
+                $em->flush();
+                foreach ($this->afterCreate as $afterCreate) {
+                    if (!call_user_func($afterCreate, $this->managerRegistry, $dataTable, $object, $objectData)) {
+                        // TODO: update error
+                        return [
+                            'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
+                        ];
+                    }
+                }
+                $output[$key] = $this->objectToArray($dataTable, $object);
             }
-            $output = [
-                0 => $this->objectToArray($dataTable, $object)
-            ];
             return [
                 'data' => $output
             ];

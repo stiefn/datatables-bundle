@@ -66,6 +66,9 @@ class DataTable
     /** @var AbstractColumn[] */
     protected $columns = [];
 
+    /** @var AbstractColumn[] */
+    protected $columnsWithoutHidden = [];
+
     /** @var array<string, AbstractColumn> */
     protected $columnsByName = [];
 
@@ -131,6 +134,14 @@ class DataTable
 
     private $allowInlineEditing = true;
 
+    private $groupingColumn = null;
+
+    private $childRowColumns = null;
+
+    private $groupCreationFields = null;
+
+    private $groupCreationField = null;
+
     /**
      * DataTable constructor.
      *
@@ -160,9 +171,12 @@ class DataTable
         }
 
         $column = $this->instantiator->getColumn($type);
-        $column->initialize($name, count($this->columns), $options, $this);
+        $column->initialize($name, count($this->columnsWithoutHidden), $options, $this);
 
         $this->columns[] = $column;
+        if(!$column->isHidden()) {
+            $this->columnsWithoutHidden[] = $column;
+        }
         $this->columnsByName[$name] = $column;
 
         return $this;
@@ -173,8 +187,9 @@ class DataTable
         $this->childrenUrls[$name] = $editUrl;
     }
 
-    public function setEditorButtons(array $editorButtons) {
+    public function setEditorButtons(array $editorButtons): self {
         $this->editorButtons = $editorButtons;
+        return $this;
     }
 
     public function hasEditorButton(string $buttonName) {
@@ -224,11 +239,11 @@ class DataTable
      */
     public function getColumn(int $index): AbstractColumn
     {
-        if ($index < 0 || $index >= count($this->columns)) {
+        if ($index < 0 || $index >= count($this->columnsWithoutHidden)) {
             throw new InvalidArgumentException(sprintf('There is no column with index %d', $index));
         }
 
-        return $this->columns[$index];
+        return $this->columnsWithoutHidden[$index];
     }
 
     /**
@@ -387,6 +402,13 @@ class DataTable
             if($this->getUseEditor()) {
                 $response['editorOptions'] = $this->getInitialEditorResponse();
                 $response['editorButtons'] = $this->editorButtons;
+                $response['groupingEnabled'] = $this->groupingEnabled();
+                if($this->groupingEnabled()) {
+                    $response['groupingColumn'] = $this->getGroupingColumn();
+                    $response['groupCreationField'] = $this->getGroupCreationField();
+                    $response['groupCreationIds'] = $this->getGroupCreationIds();
+                    $response['childRowColumns'] = $this->getChildRowColumns();
+                }
                 if(count($this->children) > 0) {
                     $response['childEditorOptions'] = [];
                     $response['childEditorUrls'] = $this->childrenUrls;
@@ -412,6 +434,13 @@ class DataTable
         if($this->getUseEditor()) {
             $response['editorOptions'] = $this->getInitialEditorResponse();
             $response['editorButtons'] = $this->editorButtons;
+            $response['groupingEnabled'] = $this->groupingEnabled();
+            if($this->groupingEnabled()) {
+                $response['groupingColumn'] = $this->getGroupingColumn();
+                $response['groupCreationField'] = $this->getGroupCreationField();
+                $response['groupCreationIds'] = $this->getGroupCreationIds();
+                $response['childRowColumns'] = $this->getChildRowColumns();
+            }
             if(count($this->children) > 0) {
                 $response['childEditorOptions'] = [];
                 $response['childEditorUrls'] = $this->childrenUrls;
@@ -524,6 +553,9 @@ class DataTable
                 }
                 if($column->isHidden() || $column->isHiddenInput()) {
                     $map[$i]['type'] = 'hidden';
+                }
+                if(!$column->isComparable()) {
+                    $map[$i]['compare'] = 'function(a,b){return false;}';
                 }
                 ++$i;
             }
@@ -733,5 +765,45 @@ class DataTable
 
     public function allowInlineEditing(bool $allow) {
         $this->allowInlineEditing = $allow;
+    }
+
+    public function getGroupingColumn(): ?string {
+        return $this->groupingColumn;
+    }
+
+    public function setGroupingColumn(?string $columnName): self {
+        $this->groupingColumn = $columnName;
+        return $this;
+    }
+
+    public function groupingEnabled(): bool {
+        return $this->groupingColumn === null ? false : true;
+    }
+
+    public function getChildRowColumns(): ?array {
+        return $this->childRowColumns;
+    }
+
+    public function setChildRowColumns(?array $childRowColumns): self {
+        $this->childRowColumns = $childRowColumns;
+        return $this;
+    }
+
+    public function getGroupCreationIds(): ?array {
+        return $this->groupCreationIds;
+    }
+
+    public function setGroupCreationIds(?array $groupCreationIds): self {
+        $this->groupCreationIds = $groupCreationIds;
+        return $this;
+    }
+
+    public function getGroupCreationField(): ?string {
+        return $this->groupCreationField;
+    }
+
+    public function setGroupCreationField(?string $groupCreationField): self {
+        $this->groupCreationField = $groupCreationField;
+        return $this;
     }
 }

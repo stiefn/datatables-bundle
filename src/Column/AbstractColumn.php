@@ -130,7 +130,8 @@ abstract class AbstractColumn
                 'type' => null,
                 'defaultValue' => null,
                 'options' => null,
-                'required' => false
+                'required' => false,
+                'comparable' => true
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -157,6 +158,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('defaultValue', ['null', 'int', 'string'])
             ->setAllowedTypes('options', ['null', 'array'])
             ->setAllowedTypes('required', ['null', 'boolean'])
+            ->setAllowedTypes('comparable', ['boolean'])
         ;
 
         return $this;
@@ -406,6 +408,10 @@ abstract class AbstractColumn
 
     public function isRequired() {
         return $this->options['required'];
+    }
+
+    public function isComparable() {
+        return $this->options['comparable'];
     }
 
 }
