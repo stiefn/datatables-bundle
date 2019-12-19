@@ -20,7 +20,7 @@ use Omines\DataTablesBundle\DataTable;
  *
  * @author Niels Keurentjes <niels.keurentjes@omines.com>
  */
-class MapColumn extends TextColumn
+class MapColumn extends AbstractColumn
 {
 
     public function initialize(string $name, int $index, array $options = [], DataTable $dataTable)
@@ -37,9 +37,12 @@ class MapColumn extends TextColumn
     /**
      * {@inheritdoc}
      */
-    public function normalize($value): string
+    public function normalize($value)
     {
-        return (string) $value;
+        if(is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+        return $value;
     }
 
     /**
