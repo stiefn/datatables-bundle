@@ -54,6 +54,8 @@ class ORMAdapter extends AbstractAdapter
     /** @var QueryBuilderProcessorInterface[] */
     protected $criteriaProcessors;
 
+    protected $alternativeEm = null;
+
     /**
      * DoctrineAdapter constructor.
      *
@@ -81,6 +83,7 @@ class ORMAdapter extends AbstractAdapter
         // Enable automated mode or just get the general default entity manager
         if(isset($options['alternativeEm']) && $options['alternativeEm'] !== null) {
             $this->manager = $this->registry->getManager($options['alternativeEm']);
+            $this->alternativeEm = $options['alternativeEm'];
         } else if (null === ($this->manager = $this->registry->getManagerForClass($options['entity']))) {
             throw new InvalidConfigurationException(sprintf('Doctrine has no manager for entity "%s", is it correctly imported and referenced?', $options['entity']));
         }
@@ -342,5 +345,9 @@ class ORMAdapter extends AbstractAdapter
         }
 
         throw new InvalidConfigurationException('Provider must be a callable or implement QueryBuilderProcessorInterface');
+    }
+
+    public function getAlternativeEntityManager(): ?string {
+        return $this->alternativeEm;
     }
 }

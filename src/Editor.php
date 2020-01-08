@@ -33,7 +33,11 @@ class Editor {
 
     public function process(DataTable $dataTable, EditorState $state, array $derivedFields = []): array {
         $this->domain = $dataTable->getTranslationDomain();
-        $em = $this->managerRegistry->getManagerForClass($dataTable->getEntityType());
+        if($dataTable->getAdapter()->getAlternativeEntityManager() !== null) {
+            $em = $this->managerRegistry->getManager($dataTable->getAdapter()->getAlternativeEntityManager());
+        } else {
+            $em = $this->managerRegistry->getManagerForClass($dataTable->getEntityType());
+        }
         switch($state->getAction()) {
             case 'create':
                 return $this->create($em, $dataTable, $state, $derivedFields);

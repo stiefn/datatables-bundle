@@ -35,4 +35,9 @@ interface AdapterInterface
      * @return ResultSetInterface
      */
     public function getData(DataTableState $state): ResultSetInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getAlternativeEntityManager(): ?string;
 }
