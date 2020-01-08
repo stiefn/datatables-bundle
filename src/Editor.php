@@ -6,9 +6,13 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
+use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Only for ORMAdapter
+ */
 class Editor {
     private $managerRegistry;
     private $validator;
@@ -33,7 +37,9 @@ class Editor {
 
     public function process(DataTable $dataTable, EditorState $state, array $derivedFields = []): array {
         $this->domain = $dataTable->getTranslationDomain();
-        if($dataTable->getAdapter()->getAlternativeEntityManager() !== null) {
+        /** @var ORMAdapter $adapter */
+        $adapter = $dataTable->getAdapter();
+        if($adapter->getAlternativeEntityManager() !== null) {
             $em = $this->managerRegistry->getManager($dataTable->getAdapter()->getAlternativeEntityManager());
         } else {
             $em = $this->managerRegistry->getManagerForClass($dataTable->getEntityType());
