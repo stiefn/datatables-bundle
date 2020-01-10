@@ -166,6 +166,7 @@
                     'editor': editor,
                     'childEditors': childEditors,
                     'editorButtons': initialConfig.editorButtons,
+                    'initialOrder': initialConfig.options.order,
                     'groupingEnabled': initialConfig.groupingEnabled
                 }
                 if(initialConfig.groupingEnabled) {
@@ -180,6 +181,7 @@
             }
             let output = {
                 'dt': dt,
+                'initialOrder': initialConfig.options.order,
                 'groupingEnabled': initialConfig.groupingEnabled
             }
             if(initialConfig.groupingEnabled) {
