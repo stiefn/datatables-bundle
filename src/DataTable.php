@@ -142,6 +142,10 @@ class DataTable
 
     private $groupCreationField = null;
 
+    private $reorderingEnabled = false;
+
+    private $validationGroup = 'Default';
+
     /**
      * DataTable constructor.
      *
@@ -780,6 +784,17 @@ class DataTable
         return $this->groupingColumn === null ? false : true;
     }
 
+    public function reorderingEnabled(): bool {
+        return $this->reorderingEnabled;
+    }
+
+    public function pagingEnabled(): bool {
+        if($this->reorderingEnabled() || $this->groupingEnabled()) {
+            return false;
+        }
+        return true;
+    }
+
     public function getChildRowColumns(): ?array {
         return $this->childRowColumns;
     }
@@ -805,5 +820,19 @@ class DataTable
     public function setGroupCreationField(?string $groupCreationField): self {
         $this->groupCreationField = $groupCreationField;
         return $this;
+    }
+
+    public function setReorderingEnabled(bool $reorderingEnabled): self {
+        $this->reorderingEnabled = $reorderingEnabled;
+        return $this;
+    }
+
+    public function setValidationGroup(string $validationGroup): self {
+        $this->validationGroup = $validationGroup;
+        return $this;
+    }
+
+    public function getValidationGroup(): string {
+        return $this->validationGroup;
     }
 }

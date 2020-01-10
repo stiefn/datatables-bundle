@@ -96,7 +96,7 @@ class Editor {
                 $type = $dataTable->getEntityType();
                 $object = new $type();
                 $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
-                $validationErrors = $this->validate($object);
+                $validationErrors = $this->validate($object, $dataTable->getValidationGroup());
                 $errors = array_merge($mergeErrors, $validationErrors);
                 if (!empty($errors)) {
                     return [
@@ -146,7 +146,7 @@ class Editor {
             foreach($data as $id => $objectData) {
                 $object = $repository->findOneBy(['id' => $id]);
                 $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
-                $validationErrors = $this->validate($object);
+                $validationErrors = $this->validate($object, $dataTable->getValidationGroup());
                 $errors = array_merge($mergeErrors, $validationErrors);
                 if(!empty($errors)) {
                     return [
@@ -258,8 +258,8 @@ class Editor {
         ];
     }
 
-    private function validate($object): array {
-        $errors = $this->validator->validate($object);
+    private function validate($object, string $validationGroup): array {
+        $errors = $this->validator->validate($object, null, [$validationGroup]);
         if(count($errors) > 0) {
             $fieldErrors = [];
             foreach($errors as $error) {
