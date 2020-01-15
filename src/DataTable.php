@@ -505,6 +505,9 @@ class DataTable
                 } else if($column->getRenderedLength() !== null) {
                     $map[$i]['renderedLength'] = $column->getRenderedLength();
                 }
+                if($column->isImage()) {
+                    $map[$i]['imageUrlPrefix'] = $column->getImageUrlPrefix();
+                }
                 ++$i;
             }
         }

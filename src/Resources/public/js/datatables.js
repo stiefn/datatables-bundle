@@ -64,6 +64,12 @@
                     return value;
                 }
             }
+            function createImageRenderFunction(prefix) {
+                return function ( value, type, row, meta ) {
+                    value = prefix + value;
+                    return '<img src="' + value + '" width="80" data-toggle="tooltip" data-html="true" data-placement="left" title="<img src=\'' + value + '\' style=\'max-width:400px\' />" />';
+                }
+            }
             for(var i = 0; i < initialConfig.options.columns.length; ++i) {
                 if(initialConfig.options.columns[i].map) {
                     var map = initialConfig.options.columns[i].map;
@@ -71,6 +77,9 @@
                 } else if(initialConfig.options.columns[i].renderedLength) {
                     var length = initialConfig.options.columns[i].renderedLength;
                     initialConfig.options.columns[i].render = createSubstrRenderFunction(length);
+                } else if(initialConfig.options.columns[i].imageUrlPrefix) {
+                    var prefix = initialConfig.options.columns[i].imageUrlPrefix;
+                    initialConfig.options.columns[i].render = createImageRenderFunction(prefix);
                 }
             }
             // Merge all options from different sources together and add the Ajax loader

@@ -132,7 +132,8 @@ abstract class AbstractColumn
                 'defaultValue' => null,
                 'options' => null,
                 'required' => false,
-                'comparable' => true
+                'comparable' => true,
+                'imageUrlPrefix' => null
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -161,6 +162,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('options', ['null', 'array'])
             ->setAllowedTypes('required', ['null', 'boolean'])
             ->setAllowedTypes('comparable', ['boolean'])
+            ->setAllowedTypes('imageUrlPrefix', ['null', 'string'])
         ;
 
         return $this;
@@ -357,6 +359,16 @@ abstract class AbstractColumn
     public function isInlineEditable(): bool
     {
         return $this->options['inlineEditable'];
+    }
+
+    public function isImage(): bool
+    {
+        return $this->options['imageUrlPrefix'] !== null;
+    }
+
+    public function getImageUrlPrefix(): string
+    {
+        return $this->options['imageUrlPrefix'];
     }
 
     public function isFile(): bool
