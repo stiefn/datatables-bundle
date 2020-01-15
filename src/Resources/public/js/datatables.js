@@ -167,7 +167,13 @@
                     'childEditors': childEditors,
                     'editorButtons': initialConfig.editorButtons,
                     'initialOrder': initialConfig.options.order,
+                    'reorderingEnabled': initialConfig.reorderingEnabled,
                     'groupingEnabled': initialConfig.groupingEnabled
+                }
+                if(initialConfig.reorderingEnabled) {
+                    output = $.extend(output, {
+                        'reorderingConstraintField': initialConfig.reorderingConstraintField
+                    });
                 }
                 if(initialConfig.groupingEnabled) {
                     output = $.extend(output, {
@@ -182,7 +188,13 @@
             let output = {
                 'dt': dt,
                 'initialOrder': initialConfig.options.order,
+                'reorderingEnabled': initialConfig.reorderingEnabled,
                 'groupingEnabled': initialConfig.groupingEnabled
+            }
+            if(initialConfig.reorderingEnabled) {
+                output = $.extend(output, {
+                    'reorderingConstraintField': initialConfig.reorderingConstraintField
+                });
             }
             if(initialConfig.groupingEnabled) {
                 output = $.extend(output, {

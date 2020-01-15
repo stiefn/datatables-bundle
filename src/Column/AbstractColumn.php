@@ -121,6 +121,7 @@ abstract class AbstractColumn
                 'operator' => '=',
                 'rightExpr' => null,
                 'editable' => true,
+                'inlineEditable' => true,
                 'file' => false,
                 'fileMany' => false,
                 'uploadHandler' => null,
@@ -149,6 +150,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('leftExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('editable', ['null', 'boolean'])
+            ->setAllowedTypes('inlineEditable', ['null', 'boolean'])
             ->setAllowedTypes('file', ['null', 'boolean'])
             ->setAllowedTypes('fileMany', ['null', 'boolean'])
             ->setAllowedTypes('dataHandler', ['null', 'callable'])
@@ -350,6 +352,11 @@ abstract class AbstractColumn
     public function isEditable(): bool
     {
         return $this->options['editable'];
+    }
+
+    public function isInlineEditable(): bool
+    {
+        return $this->options['inlineEditable'];
     }
 
     public function isFile(): bool

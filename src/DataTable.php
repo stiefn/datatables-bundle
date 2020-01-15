@@ -144,6 +144,8 @@ class DataTable
 
     private $reorderingEnabled = false;
 
+    private $reorderingConstraintField = null;
+
     private $validationGroup = 'Default';
 
     /**
@@ -413,6 +415,10 @@ class DataTable
                     $response['groupCreationIds'] = $this->getGroupCreationIds();
                     $response['childRowColumns'] = $this->getChildRowColumns();
                 }
+                $response['reorderingEnabled'] = $this->reorderingEnabled();
+                if($this->reorderingEnabled()) {
+                    $response['reorderingConstraintField'] = $this->getReorderingConstraintField();
+                }
                 if(count($this->children) > 0) {
                     $response['childEditorOptions'] = [];
                     $response['childEditorUrls'] = $this->childrenUrls;
@@ -444,6 +450,10 @@ class DataTable
                 $response['groupCreationField'] = $this->getGroupCreationField();
                 $response['groupCreationIds'] = $this->getGroupCreationIds();
                 $response['childRowColumns'] = $this->getChildRowColumns();
+            }
+            $response['reorderingEnabled'] = $this->reorderingEnabled();
+            if($this->reorderingEnabled()) {
+                $response['reorderingConstraintField'] = $this->getReorderingConstraintField();
             }
             if(count($this->children) > 0) {
                 $response['childEditorOptions'] = [];
@@ -487,7 +497,7 @@ class DataTable
                     'visible' => $column->isVisible(),
                     'className' => $column->getClassName()
                 ];
-                if($column->isEditable() && $this->allowInlineEditing) {
+                if($column->isEditable() && $column->isInlineEditable() && $this->allowInlineEditing) {
                     $map[$i]['className'] .= ' editable';
                 }
                 if($column->getMap() !== null) {
@@ -825,6 +835,14 @@ class DataTable
     public function setReorderingEnabled(bool $reorderingEnabled): self {
         $this->reorderingEnabled = $reorderingEnabled;
         return $this;
+    }
+
+    public function setReorderingConstraintField(?string $field) {
+        $this->reorderingConstraintField = $field;
+    }
+
+    public function getReorderingConstraintField(): ?string {
+        return $this->reorderingConstraintField;
     }
 
     public function setValidationGroup(string $validationGroup): self {
