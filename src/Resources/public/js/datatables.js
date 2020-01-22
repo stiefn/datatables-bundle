@@ -190,6 +190,7 @@
                         'groupCreationField': initialConfig.groupCreationField,
                         'groupCreationIds': initialConfig.groupCreationIds,
                         'childRowColumns': initialConfig.childRowColumns,
+                        'groupingConstraintField': initialConfig.groupingConstraintField
                     });
                 }
                 fulfill(output)
@@ -208,7 +209,10 @@
             if(initialConfig.groupingEnabled) {
                 output = $.extend(output, {
                     'groupingColumn': initialConfig.groupingColumn,
+                    'groupCreationField': initialConfig.groupCreationField,
+                    'groupCreationIds': initialConfig.groupCreationIds,
                     'childRowColumns': initialConfig.childRowColumns,
+                    'groupingConstraintField': initialConfig.groupingConstraintField
                 });
             }
             fulfill(output);

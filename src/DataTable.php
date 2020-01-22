@@ -148,6 +148,8 @@ class DataTable
 
     private $validationGroup = 'Default';
 
+    private $groupingConstraintField = null;
+
     /**
      * DataTable constructor.
      *
@@ -414,6 +416,7 @@ class DataTable
                     $response['groupCreationField'] = $this->getGroupCreationField();
                     $response['groupCreationIds'] = $this->getGroupCreationIds();
                     $response['childRowColumns'] = $this->getChildRowColumns();
+                    $response['groupingConstraintField'] = $this->getGroupingConstraintField();
                 }
                 $response['reorderingEnabled'] = $this->reorderingEnabled();
                 if($this->reorderingEnabled()) {
@@ -450,6 +453,7 @@ class DataTable
                 $response['groupCreationField'] = $this->getGroupCreationField();
                 $response['groupCreationIds'] = $this->getGroupCreationIds();
                 $response['childRowColumns'] = $this->getChildRowColumns();
+                $response['groupingConstraintField'] = $this->getGroupingConstraintField();
             }
             $response['reorderingEnabled'] = $this->reorderingEnabled();
             if($this->reorderingEnabled()) {
@@ -847,6 +851,7 @@ class DataTable
 
     public function setReorderingConstraintField(?string $field) {
         $this->reorderingConstraintField = $field;
+        return $this;
     }
 
     public function getReorderingConstraintField(): ?string {
@@ -860,5 +865,14 @@ class DataTable
 
     public function getValidationGroup(): string {
         return $this->validationGroup;
+    }
+
+    public function setGroupingConstraintField(?string $field) {
+        $this->groupingConstraintField = $field;
+        return $this;
+    }
+
+    public function getGroupingConstraintField(): ?string {
+        return $this->groupingConstraintField;
     }
 }
