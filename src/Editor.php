@@ -46,10 +46,16 @@ class Editor {
         }
         switch($state->getAction()) {
             case 'create':
-                return $this->create($em, $dataTable, $state, $derivedFields);
+                return $this->create($em, $dataTable, $state, $derivedFields, true);
+
+            case 'create_no_validation':
+                return $this->create($em, $dataTable, $state, $derivedFields, false);
 
             case 'edit':
-                return $this->edit($em, $dataTable, $state, $derivedFields);
+                return $this->edit($em, $dataTable, $state, $derivedFields, true);
+
+            case 'edit_no_validation':
+                return $this->edit($em, $dataTable, $state, $derivedFields, false);
 
             case 'remove':
                 return $this->remove($em, $dataTable, $state, $derivedFields);
@@ -87,7 +93,8 @@ class Editor {
         EntityManagerInterface $em,
         DataTable $dataTable,
         EditorState $state,
-        array $derivedFields
+        array $derivedFields,
+        bool $validate = true
     ): array {
 	    $data = $state->getData();
 	    if(is_array($data) && count($data) > 0) {
@@ -96,7 +103,10 @@ class Editor {
                 $type = $dataTable->getEntityType();
                 $object = new $type();
                 $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
-                $validationErrors = $this->validate($object, $dataTable->getValidationGroup());
+                $validationErrors = [];
+                if($validate) {
+                    $validationErrors = $this->validate($object, $dataTable->getValidationGroup());
+                }
                 $errors = array_merge($mergeErrors, $validationErrors);
                 if (!empty($errors)) {
                     return [
@@ -136,7 +146,8 @@ class Editor {
         EntityManagerInterface $em,
         DataTable $dataTable,
         EditorState $state,
-        array $derivedFields
+        array $derivedFields,
+        bool $validate = true
     ): array {
         $data = $state->getData();
         $repository = $em->getRepository($dataTable->getEntityType());
@@ -146,7 +157,10 @@ class Editor {
             foreach($data as $id => $objectData) {
                 $object = $repository->findOneBy(['id' => $id]);
                 $mergeErrors = $this->mergeObject($em, $object, $dataTable, $objectData, $derivedFields);
-                $validationErrors = $this->validate($object, $dataTable->getValidationGroup());
+                $validationErrors = [];
+                if($validate) {
+                    $validationErrors = $this->validate($object, $dataTable->getValidationGroup());
+                }
                 $errors = array_merge($mergeErrors, $validationErrors);
                 if(!empty($errors)) {
                     return [
