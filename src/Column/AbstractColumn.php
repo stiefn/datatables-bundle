@@ -433,4 +433,8 @@ abstract class AbstractColumn
         return $this->options['comparable'];
     }
 
+    public function getFormat() {
+        return $this->options['format'];
+    }
+
 }

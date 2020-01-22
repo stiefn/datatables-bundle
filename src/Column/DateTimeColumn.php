@@ -26,7 +26,7 @@ class DateTimeColumn extends AbstractColumn
      */
     public function normalize($value)
     {
-        if (null === $value) {
+        if ($value === null || $value === 0) {
             return $this->options['nullValue'];
         } elseif (!$value instanceof \DateTimeInterface) {
             if(is_integer($value)) {

@@ -508,6 +508,10 @@ class DataTable
                 if($column->isImage()) {
                     $map[$i]['imageUrlPrefix'] = $column->getImageUrlPrefix();
                 }
+                if($column->isDate()) {
+                    $map[$i]['type'] = 'date';
+                    $map[$i]['dateFormat'] = $column->getFormat();
+                }
                 ++$i;
             }
         }
@@ -561,6 +565,7 @@ class DataTable
                 }
                 if($column->isDate()) {
                     $map[$i]['type'] = 'date';
+                    $map[$i]['dateFormat'] = $column->getFormat();
                 }
                 if($column->getDefaultValue() !== null) {
                     $map[$i]['def'] = $column->getDefaultValue();
