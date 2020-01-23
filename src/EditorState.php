@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EditorState {
     private $action;
+    private $subActions = [];
     private $data = null;
     private $uploadField = null;
     private $upload = null;
@@ -21,8 +22,16 @@ class EditorState {
         $this->upload = $upload;
     }
 
+    public function setSubActions(array $subActions) {
+        $this->subActions = $subActions;
+    }
+
     public function getAction(): string {
 	    return $this->action;
+    }
+
+    public function getSubActions(): array {
+        return $this->subActions;
     }
 
     public function getData(): ?array {

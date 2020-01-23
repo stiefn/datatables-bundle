@@ -324,6 +324,14 @@ class DataTable
     }
 
     /**
+     * @return EditorState|null
+     */
+    public function getEditorState()
+    {
+        return $this->editorState;
+    }
+
+    /**
      * @return string
      */
     public function getTranslationDomain(): string
@@ -373,6 +381,10 @@ class DataTable
             // handle request for datatable editor actions
             if (null === $this->editorState) {
                 $this->editorState = new EditorState();
+
+                if($parameters->get('subActions') && is_array($parameters->get('subActions'))) {
+                    $this->editorState->setSubActions($parameters->get('subActions'));
+                }
 
                 if($parameters->get('data')) {
                     $this->editorState->setDataAction($parameters->get('action'), $parameters->get('data'));
