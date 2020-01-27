@@ -27,6 +27,7 @@ use Omines\DataTablesBundle\Exception\MissingDependencyException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * ORMAdapter.
@@ -59,9 +60,9 @@ class ORMAdapter extends AbstractAdapter
     /**
      * DoctrineAdapter constructor.
      *
-     * @param RegistryInterface|null $registry
+     * @param Registry|null $registry
      */
-    public function __construct(RegistryInterface $registry = null)
+    public function __construct(Registry $registry = null)
     {
         if (null === $registry) {
             throw new MissingDependencyException('Install doctrine/doctrine-bundle to use the ORMAdapter');
