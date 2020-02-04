@@ -216,7 +216,7 @@ class Editor {
             $q = $em->createQuery('DELETE FROM ' . $dataTable->getEntityType() . ' o WHERE o.id IN (' .
                 implode(', ', $ids) . ')');
             foreach($this->beforeRemove as $beforeRemove) {
-                if(!call_user_func($beforeRemove, $this->managerRegistry, $dataTable, $object, $objectData)) {
+                if(!call_user_func($beforeRemove, $this->managerRegistry, $dataTable, $ids)) {
                     // TODO: update error
                     return [
                         'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
@@ -225,7 +225,7 @@ class Editor {
             }
             $q->execute();
             foreach($this->afterRemove as $afterRemove) {
-                if(!call_user_func($afterRemove, $this->managerRegistry, $dataTable, $object, $objectData)) {
+                if(!call_user_func($afterRemove, $this->managerRegistry, $dataTable, $ids)) {
                     // TODO: update error
                     return [
                         'error' => $this->translator->trans('datatable.editor.error.emptyData', [], $this->domain)
