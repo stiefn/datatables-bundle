@@ -592,6 +592,9 @@ class DataTable
                 if($column->isHidden() || $column->isHiddenInput()) {
                     $map[$i]['type'] = 'hidden';
                 }
+                if($column->isHiddenInDialog()) {
+                    $map[$i]['className'] = 'hidden-input';
+                }
                 if(!$column->isComparable()) {
                     $map[$i]['compare'] = 'function(a,b){return false;}';
                 }

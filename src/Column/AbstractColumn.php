@@ -128,6 +128,7 @@ abstract class AbstractColumn
                 'dataHandler' => null,
                 'hidden' => false,
                 'hiddenInput' => false,
+                'hiddenInDialog' => false,
                 'type' => null,
                 'defaultValue' => null,
                 'options' => null,
@@ -157,6 +158,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('dataHandler', ['null', 'callable'])
             ->setAllowedTypes('hidden', ['boolean'])
             ->setAllowedTypes('hiddenInput', ['boolean'])
+            ->setAllowedTypes('hiddenInDialog', ['boolean'])
             ->setAllowedTypes('type', ['null', 'string'])
             ->setAllowedTypes('defaultValue', ['null', 'int', 'string'])
             ->setAllowedTypes('options', ['null', 'array'])
@@ -340,6 +342,10 @@ abstract class AbstractColumn
 
     public function isHiddenInput(): bool {
         return $this->options['hiddenInput'];
+    }
+
+    public function isHiddenInDialog(): bool {
+        return $this->options['hiddenInDialog'];
     }
 
     /**
