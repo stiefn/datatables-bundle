@@ -576,6 +576,12 @@ class DataTable
                         'rows' => $lines
                     ];
                 }
+                $maxLength = $column->getOption('maxLength');
+                if(!is_null($maxLength) && $maxLength > 1) {
+                    $map[$i]['attr'] = [
+                        'maxlength' => $maxLength
+                    ];
+                }
                 if($column->getFieldOptions()) {
                     $map[$i]['options'] = $column->getFieldOptions();
                 }

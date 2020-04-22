@@ -48,8 +48,10 @@ class TextColumn extends AbstractColumn
             )
             ->setDefault('raw', false)
             ->setDefault('lines', 1)
+            ->setDefault('maxLength', null)
             ->setAllowedTypes('raw', 'bool')
             ->setAllowedTypes('lines', 'int')
+            ->setAllowedTypes('maxLength', ['null', 'int'])
         ;
 
         return $this;
