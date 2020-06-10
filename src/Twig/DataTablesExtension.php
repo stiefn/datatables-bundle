@@ -13,9 +13,11 @@ declare(strict_types=1);
 namespace Omines\DataTablesBundle\Twig;
 
 use Omines\DataTablesBundle\DataTable;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class DataTablesExtension extends \Twig_Extension
+class DataTablesExtension extends AbstractExtension
 {
     /** @var TranslatorInterface */
     protected $translator;
@@ -36,7 +38,7 @@ class DataTablesExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('datatable_settings', function (DataTable $dataTable) {
+            new TwigFunction('datatable_settings', function (DataTable $dataTable) {
                 return json_encode([
                     'name' => $dataTable->getName(),
                     'method' => $dataTable->getMethod(),

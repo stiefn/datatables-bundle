@@ -14,7 +14,7 @@ namespace Omines\DataTablesBundle;
 
 use Omines\DataTablesBundle\DependencyInjection\Instantiator;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DataTableFactory
 {

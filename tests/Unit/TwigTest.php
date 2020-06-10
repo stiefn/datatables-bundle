@@ -16,7 +16,7 @@ use Omines\DataTablesBundle\Twig\DataTablesExtension;
 use Omines\DataTablesBundle\Twig\TwigRenderer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * TwigTest.

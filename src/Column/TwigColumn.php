@@ -14,7 +14,7 @@ namespace Omines\DataTablesBundle\Column;
 
 use Omines\DataTablesBundle\Exception\MissingDependencyException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Twig_Environment;
+use Twig\Environment as Twig_Environment;
 
 /**
  * TwigColumn.

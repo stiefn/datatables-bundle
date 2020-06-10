@@ -15,7 +15,7 @@ namespace Omines\DataTablesBundle\Twig;
 use Omines\DataTablesBundle\DataTable;
 use Omines\DataTablesBundle\DataTableRendererInterface;
 use Omines\DataTablesBundle\Exception\MissingDependencyException;
-use Twig_Environment;
+use Twig\Environment as Twig_Environment;
 
 /**
  * TwigRenderer.

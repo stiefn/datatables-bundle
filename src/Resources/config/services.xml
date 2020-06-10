@@ -24,14 +24,14 @@
             <argument type="service" id="datatables.renderer" />
             <argument type="service" id="Omines\DataTablesBundle\DependencyInjection\Instantiator" />
 			<argument type="service" id="Omines\DataTablesBundle\Editor" />
-			<argument type="service" id="Symfony\Component\Translation\TranslatorInterface" />
+			<argument type="service" id="Symfony\Contracts\Translation\TranslatorInterface" />
         </service>
 		
 		<!-- Editor -->
 		<service id="Omines\DataTablesBundle\Editor">
             <argument type="service" id="Doctrine\Common\Persistence\ManagerRegistry" />
 			<argument type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface" />
-			<argument type="service" id="Symfony\Component\Translation\TranslatorInterface" />
+			<argument type="service" id="Symfony\Contracts\Translation\TranslatorInterface" />
         </service>
 
         <!-- Support services -->
