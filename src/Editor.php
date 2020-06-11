@@ -2,10 +2,12 @@
 
 namespace Omines\DataTablesBundle;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\PersistentCollection;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -298,51 +300,66 @@ class Editor {
         $errors = [];
         foreach($dataTable->getColumns() as $column) {
             if(isset($objectData[$column->getName()])) {
-                $method = 'set' . ucfirst($column->getName());
-                if(method_exists($object, $method)) {
-                    $handler = $column->getDataHandler();
-                    if($handler !== null) {
-                        //echo $column->getName() . ' ' . $handler($objectData, $objectData[$column->getName()]);
-                        $objectData[$column->getName()] = $handler($objectData, $objectData[$column->getName()]);
-                    }
-                    $setterType = $reflect->getMethod($method)->getParameters()[0]->getType();
-                    if($setterType !== null && $setterType->getName() !== 'string') {
-                        switch($setterType->getName()) {
-                            case 'int':
-                                if(!$setterType->allowsNull() || $objectData[$column->getName()] !== '') {
-                                    if ((string)intval($objectData[$column->getName()]) !== (string)$objectData[$column->getName()]) {
+                if(!is_array($objectData[$column->getName()])) {
+                    $method = 'set' . ucfirst($column->getName());
+                    if (method_exists($object, $method)) {
+                        $handler = $column->getDataHandler();
+                        if ($handler !== null) {
+                            //echo $column->getName() . ' ' . $handler($objectData, $objectData[$column->getName()]);
+                            $objectData[$column->getName()] = $handler($objectData, $objectData[$column->getName()]);
+                        }
+                        $setterType = $reflect->getMethod($method)->getParameters()[0]->getType();
+                        if ($setterType !== null && $setterType->getName() !== 'string') {
+                            switch ($setterType->getName()) {
+                                case 'int':
+                                    if (!$setterType->allowsNull() || $objectData[$column->getName()] !== '') {
+                                        if ((string)intval($objectData[$column->getName()]) !== (string)$objectData[$column->getName()]) {
+                                            $errors[] = [
+                                                'name' => $column->getName(),
+                                                'status' => $this->translator->trans('datatable.editor.error.integerRequired', [], $this->domain)
+                                            ];
+                                            continue 2;
+                                        }
+                                    } else if ($setterType->allowsNull()) {
+                                        $objectData[$column->getName()] = null;
+                                    }
+                            }
+                        }
+                        // if the setter requires an entity object
+                        if ($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
+                            try {
+                                if ($objectData[$column->getName()] !== null && $objectData[$column->getName()] !== '') {
+                                    $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
+                                } else {
+                                    if (!$column->isHidden()) {
                                         $errors[] = [
                                             'name' => $column->getName(),
-                                            'status' => $this->translator->trans('datatable.editor.error.integerRequired', [], $this->domain)
+                                            'status' => $this->translator->trans('datatable.editor.error.entityRequired', [], $this->domain)
                                         ];
-                                        continue 2;
                                     }
-                                } else if($setterType->allowsNull()) {
-                                    $objectData[$column->getName()] = null;
                                 }
+                            } catch (ORMException $e) {
+                                $errors[] = [
+                                    'name' => $column->getName(),
+                                    'status' => $this->translator->trans('blub', [], $this->domain)
+                                ];
+                            }
+                        } else {
+                            $object->$method($objectData[$column->getName()]);
                         }
                     }
-                    // if the setter requires an entity object
-                    if($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
-                        try {
-                            if($objectData[$column->getName()] !== null && $objectData[$column->getName()] !== '') {
-                                $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
-                            } else {
-                                if(!$column->isHidden()) {
-                                    $errors[] = [
-                                        'name' => $column->getName(),
-                                        'status' => $this->translator->trans('datatable.editor.error.entityRequired', [], $this->domain)
-                                    ];
-                                }
-                            }
-                        } catch(ORMException $e) {
-                            $errors[] = [
-                                'name' => $column->getName(),
-                                'status' => $this->translator->trans('blub', [], $this->domain)
-                            ];
+                } else if(property_exists(get_class($object), $column->getName())) {
+                    $reflection = new \ReflectionClass($object);
+                    $property = $reflection->getProperty($column->getName());
+                    $property->setAccessible(true);
+                    /** @var PersistentCollection $collection */
+                    $collection = $property->getValue($object);
+                    preg_match('/targetEntity=(.*)::class,/', $property->getDocComment(), $matches);
+                    if(get_class($collection) === PersistentCollection::class) {
+                        $collection->clear();
+                        foreach($objectData[$column->getName()] as $value) {
+                            $collection->add($em->getReference($reflection->getNamespaceName() . '\\' . $matches[1], $value));
                         }
-                    } else {
-                        $object->$method($objectData[$column->getName()]);
                     }
                 }
                 if($column->isRequired()) {

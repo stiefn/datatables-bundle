@@ -200,8 +200,9 @@ class ORMAdapter extends AbstractAdapter
             ;
         }
 
-        foreach ($builder->getQuery()->iterate([], $this->hydrationMode) as $result) {
-            yield $entity = array_values($result)[0];
+        //foreach ($builder->getQuery()->iterate([], $this->hydrationMode) as $result) {
+        foreach ($builder->getQuery()->execute([], $this->hydrationMode) as $result) {
+            yield $entity = $result;
             if (Query::HYDRATE_OBJECT === $this->hydrationMode) {
                 $this->manager->detach($entity);
             }

@@ -560,6 +560,9 @@ class DataTable
                 }
                 if($column->getNormalizedMap() !== null) {
                     $map[$i]['type'] = 'select';
+                    if($column->getOption('multiple') === true) {
+                        $map[$i]['multiple'] = true;
+                    }
                     $mapping = [];
                     foreach($column->getNormalizedMap() as $key => $value) {
                         $mapping[] = [

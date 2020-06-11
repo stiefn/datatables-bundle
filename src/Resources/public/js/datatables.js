@@ -50,8 +50,17 @@
 
             function createMapRenderFunction(map) {
                 return function ( value, type, row, meta ) {
-                    if(map[value]) {
-                        return map[value];
+                    if(Array.isArray(value)) {
+                        for(let i = 0; i < value.length; ++i) {
+                            if(map[value[i]]) {
+                                value[i] = map[value[i]];
+                            }
+                        }
+                        return value;
+                    } else {
+                        if(map[value]) {
+                            return map[value];
+                        }
                     }
                     return '';
                 }
