@@ -51,12 +51,13 @@
             function createMapRenderFunction(map) {
                 return function ( value, type, row, meta ) {
                     if(Array.isArray(value)) {
+                        let output = [];
                         for(let i = 0; i < value.length; ++i) {
                             if(map[value[i]]) {
-                                value[i] = map[value[i]];
+                                output[i] = map[value[i]];
                             }
                         }
-                        return value;
+                        return output;
                     } else {
                         if(map[value]) {
                             return map[value];
