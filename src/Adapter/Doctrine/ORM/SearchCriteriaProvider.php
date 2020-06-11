@@ -68,7 +68,7 @@ class SearchCriteriaProvider implements QueryBuilderProcessorInterface
                 } else {
                     if(is_array($search)) {
                         if(count($search) == 2) {
-                            $queryBuilder->andWhere($queryBuilder->expr()->between($field, $search[0], $search[1]));
+                            $queryBuilder->andWhere($queryBuilder->expr()->between($field, '\'' . $search[0] . '\'', '\'' . $search[1] . '\''));
                         }
                     } else {
                         $queryBuilder->andWhere(new Comparison($field, $filter->getOperator(), $queryBuilder->expr()->literal($search)));
