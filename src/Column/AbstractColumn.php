@@ -415,6 +415,10 @@ abstract class AbstractColumn
         return null;
     }
 
+    public function getEndpoint(): ?string {
+        return null;
+    }
+
     public function getNormalizedMap(): ?array {
         return null;
     }

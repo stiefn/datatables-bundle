@@ -354,7 +354,7 @@ class Editor {
                     $property->setAccessible(true);
                     /** @var PersistentCollection $collection */
                     $collection = $property->getValue($object);
-                    preg_match('/targetEntity=(.*)::class,/', $property->getDocComment(), $matches);
+                    preg_match('/targetEntity=(.*)::class[,)]/', $property->getDocComment(), $matches);
                     if(get_class($collection) === PersistentCollection::class) {
                         $collection->clear();
                         foreach($objectData[$column->getName()] as $value) {

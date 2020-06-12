@@ -80,6 +80,11 @@
                     return '<img src="' + value + '" width="80" data-toggle="tooltip" data-html="true" data-placement="left" title="<img src=\'' + value + '\' style=\'max-width:400px\' />" />';
                 }
             }
+            function createEntityRenderFunction() {
+                return function ( value, type, row, meta ) {
+                    return value.name;
+                }
+            }
             for(var i = 0; i < initialConfig.options.columns.length; ++i) {
                 if(initialConfig.options.columns[i].map) {
                     var map = initialConfig.options.columns[i].map;
@@ -90,6 +95,8 @@
                 } else if(initialConfig.options.columns[i].imageUrlPrefix) {
                     var prefix = initialConfig.options.columns[i].imageUrlPrefix;
                     initialConfig.options.columns[i].render = createImageRenderFunction(prefix);
+                } else if(initialConfig.options.columns[i].endpoint) {
+                    initialConfig.options.columns[i].render = createEntityRenderFunction();
                 }
             }
             // Merge all options from different sources together and add the Ajax loader
@@ -415,6 +422,86 @@
         tinymce: function ( conf ) {
             return tinymce.get( conf._safeId );
         }
+    };
+
+}));
+
+(function( factory ){
+    if ( typeof define === 'function' && define.amd ) {
+        // AMD
+        define( ['jquery', 'datatables', 'datatables-editor'], factory );
+    }
+    else if ( typeof exports === 'object' ) {
+        // Node / CommonJS
+        module.exports = function ($, dt) {
+            if ( ! $ ) { $ = require('jquery'); }
+            factory( $, dt || $.fn.dataTable || require('datatables') );
+        };
+    }
+    else if ( jQuery ) {
+        // Browser standard
+        factory( jQuery, jQuery.fn.dataTable );
+    }
+}(function( $, DataTable ) {
+    'use strict';
+
+
+    if ( ! DataTable.ext.editorFields ) {
+        DataTable.ext.editorFields = {};
+    }
+
+    var _fieldTypes = DataTable.Editor ?
+        DataTable.Editor.fieldTypes :
+        DataTable.ext.editorFields;
+
+
+    _fieldTypes.entity = {
+        create: function ( conf ) {
+            var that = this;
+            $('head').append('<style type="text/css">.entity_field {position: relative;}.entity_field .results {display: none;position: absolute;width: 100%;background: #eee;z-index: 2;}.entity_field .results ul {list-style: none;margin: 0;padding: 0;}.entity_field .results ul li {width: 100%;padding: 10px;box-sizing: border-box;cursor: pointer;}.entity_field .results ul li:hover {background: #ddd;}</style>');
+            conf._safeId = DataTable.Editor.safeId( conf.id );
+
+            conf._input = $('<div class="entity_field"><input type="text" id="'+conf._safeId+'" /><div class="results"><ul></ul></div></div>');
+
+            conf._input.find('input').on('keyup', function() {
+                $.get(conf.endpoint + $(this).val(), function(data) {
+                    conf._input.find('.results ul').empty();
+                    let i = 0;
+                    for(let key in data['hydra:member']) {
+                        let li = $('<li data-id="' + data['hydra:member'][key]['@id'] + '">' + data['hydra:member'][key]['name'] + '</li>');
+                        li.click(function() {
+                            conf._input.find('input').val(li.text());
+                            conf._input.find('input').data('id', li.data('id'));
+                            conf._input.find('.results').hide();
+                        });
+                        conf._input.find('.results ul').append(li);
+                        ++i;
+                    }
+                    if(i > 0) {
+                        conf._input.find('.results').show();
+                    } else {
+                        conf._input.find('.results').hide();
+                    }
+                });
+            });
+
+            return conf._input;
+        },
+
+        get: function ( conf ) {
+            return conf._input.find('input').data('id');
+        },
+
+        set: function ( conf, val ) {
+            conf._input.find('input').val(val.name);
+            conf._input.find('input').data('id', val.id);
+        },
+
+        enable: function ( conf ) {}, // not supported in TinyMCE
+
+        disable: function ( conf ) {}, // not supported in TinyMCE
+
+        destroy: function (conf) {},
     };
 
 }));

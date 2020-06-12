@@ -528,6 +528,9 @@ class DataTable
                     $map[$i]['type'] = 'date';
                     $map[$i]['dateFormat'] = $column->getFormat();
                 }
+                if($column->getEndpoint()) {
+                    $map[$i]['endpoint'] = $column->getEndpoint();
+                }
                 ++$i;
             }
         }
@@ -606,6 +609,9 @@ class DataTable
                 }
                 if(!$column->isComparable()) {
                     $map[$i]['compare'] = 'function(a,b){return false;}';
+                }
+                if($column->getEndpoint()) {
+                    $map[$i]['endpoint'] = $column->getEndpoint();
                 }
                 ++$i;
             }
