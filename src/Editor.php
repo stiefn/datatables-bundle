@@ -3,6 +3,7 @@
 namespace Omines\DataTablesBundle;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -355,7 +356,7 @@ class Editor {
                     /** @var PersistentCollection $collection */
                     $collection = $property->getValue($object);
                     preg_match('/targetEntity=(.*)::class[,)]/', $property->getDocComment(), $matches);
-                    if(get_class($collection) === PersistentCollection::class) {
+                    if(in_array(Collection::class, class_implements(get_class($collection)))) {
                         $collection->clear();
                         foreach($objectData[$column->getName()] as $value) {
                             $collection->add($em->getReference($reflection->getNamespaceName() . '\\' . $matches[1], $value));
