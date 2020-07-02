@@ -359,7 +359,7 @@
                         selector: '#'+conf._safeId,
                         height: '250',
                         language: 'de',
-                        plugins: ['link']
+                        plugins: ['link','lists']
                     }, conf.opts, {
                         init_instance_callback: createInitFunction(conf._initSetVal)
                     } ) );
