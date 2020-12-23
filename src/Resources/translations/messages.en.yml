@@ -31,6 +31,7 @@ datatable:
             emptyData: "Incorrect data format"
             emptyUpload: "Incorrect file upload"
             integerRequired: "This value must be an integer"
+            arrayRequired: "This value must be an array"
             entityRequired: "Dieser value has to be set"
             fieldRequired: "This field is required"
         fileUpload:

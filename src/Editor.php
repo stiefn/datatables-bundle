@@ -301,7 +301,7 @@ class Editor {
         $errors = [];
         foreach($dataTable->getColumns() as $column) {
             if(isset($objectData[$column->getName()])) {
-                if(!is_array($objectData[$column->getName()])) {
+                if(!is_array($objectData[$column->getName()]) || $column->getType() === 'array') {
                     $method = 'set' . ucfirst($column->getName());
                     if (method_exists($object, $method)) {
                         $handler = $column->getDataHandler();
@@ -324,6 +324,20 @@ class Editor {
                                     } else if ($setterType->allowsNull()) {
                                         $objectData[$column->getName()] = null;
                                     }
+                                    break;
+                                case 'array':
+                                    if (!$setterType->allowsNull() || $objectData[$column->getName()] !== '') {
+                                        if (!is_array($objectData[$column->getName()])) {
+                                            $errors[] = [
+                                                'name' => $column->getName(),
+                                                'status' => $this->translator->trans('datatable.editor.error.arrayRequired', [], $this->domain)
+                                            ];
+                                            continue 2;
+                                        }
+                                    } else if ($setterType->allowsNull()) {
+                                        $objectData[$column->getName()] = null;
+                                    }
+                                    break;
                             }
                         }
                         // if the setter requires an entity object
