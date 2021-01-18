@@ -28,6 +28,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * ORMAdapter.
@@ -126,12 +127,16 @@ class ORMAdapter extends AbstractAdapter
         /** @var Query\Expr\From $fromClause */
         $fromClause = $builder->getDQLPart('from')[0];
         $identifier = "{$fromClause->getAlias()}.{$this->metadata->getSingleIdentifierFieldName()}";
-        $query->setTotalRows($this->getCount($builder, $identifier));
+        //$query->setTotalRows($this->getCount($builder, $identifier));
+        $results = new Paginator($builder);
+        $query->setTotalRows($results->count());
 
         // Get record count after filtering
         $this->buildCriteria($builder, $state);
 
-        $query->setFilteredRows($this->getCount($builder, $identifier));
+        //$query->setFilteredRows($this->getCount($builder, $identifier));
+        $results = new Paginator($builder);
+        $query->setFilteredRows($results->count());
 
         // Perform mapping of all referred fields and implied fields
         $aliases = $this->getAliases($query);
@@ -200,6 +205,10 @@ class ORMAdapter extends AbstractAdapter
             ;
         }
 
+        $results = new Paginator($builder);
+        return $results;
+
+        /*
         //foreach ($builder->getQuery()->iterate([], $this->hydrationMode) as $result) {
         foreach ($builder->getQuery()->execute([], $this->hydrationMode) as $result) {
             yield $entity = $result;
@@ -207,6 +216,7 @@ class ORMAdapter extends AbstractAdapter
                 $this->manager->detach($entity);
             }
         }
+        */
     }
 
     /**
