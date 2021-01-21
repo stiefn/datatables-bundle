@@ -28,7 +28,7 @@ class TextColumn extends AbstractColumn
     {
         $value = (string) $value;
 
-        return $this->isRaw() ? $value : htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE);
+        return $this->isRaw() ? $value : htmlspecialchars($value, ENT_NOQUOTES);
     }
 
     /**
