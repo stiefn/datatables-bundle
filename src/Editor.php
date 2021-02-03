@@ -341,12 +341,18 @@ class Editor {
                             }
                         }
                         // if the setter requires an entity object
-                        if ($setterType !== null && strpos($setterType->getName(), 'App') !== false) {
+                        if ($setterType !== null && ($setterType->getName() === 'self' || strpos($setterType->getName(), 'App') !== false)) {
                             try {
                                 if ($objectData[$column->getName()] !== null && $objectData[$column->getName()] !== '') {
-                                    $object->$method($em->getReference($setterType->getName(), $objectData[$column->getName()]));
+                                    $type = $setterType->getName();
+                                    if($type === 'self') {
+                                        $type = get_class($object);
+                                    }
+                                    $object->$method($em->getReference($type, $objectData[$column->getName()]));
                                 } else {
-                                    if (!$column->isHidden()) {
+                                    if($setterType->allowsNull()) {
+                                        $object->$method(null);
+                                    } else if (!$column->isHidden()) {
                                         $errors[] = [
                                             'name' => $column->getName(),
                                             'status' => $this->translator->trans('datatable.editor.error.entityRequired', [], $this->domain)
