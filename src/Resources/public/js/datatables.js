@@ -489,6 +489,9 @@
         },
 
         get: function ( conf ) {
+            if(conf._input.find('input').val().length === 0) {
+                return null;
+            }
             return conf._input.find('input').data('id');
         },
 
