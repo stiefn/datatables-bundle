@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Omines\DataTablesBundle\Adapter\Doctrine;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -198,6 +199,7 @@ class ORMAdapter extends AbstractAdapter
                 $builder->addOrderBy($column->getOrderField(), $direction);
             }
         }
+
         if ($state->getLength() > 0) {
             $builder
                 ->setFirstResult($state->getStart())
@@ -205,11 +207,13 @@ class ORMAdapter extends AbstractAdapter
             ;
         }
 
-        $results = new Paginator($builder);
+        $q = $builder->getQuery();
+        $q->setHydrationMode($this->hydrationMode);
+        $results = new Paginator($q);
+
         return $results;
 
         /*
-        //foreach ($builder->getQuery()->iterate([], $this->hydrationMode) as $result) {
         foreach ($builder->getQuery()->execute([], $this->hydrationMode) as $result) {
             yield $entity = $result;
             if (Query::HYDRATE_OBJECT === $this->hydrationMode) {
@@ -314,7 +318,7 @@ class ORMAdapter extends AbstractAdapter
 
         $resolver
             ->setDefaults([
-                'hydrate' => Query::HYDRATE_OBJECT,
+                'hydrate' => Query::HYDRATE_ARRAY,
                 'alternativeEm' => null,
                 'query' => [],
                 'criteria' => function (Options $options) {
